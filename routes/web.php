@@ -295,7 +295,7 @@ Route::get('/account/security', function (Request $request) {
         ->header('Cache-Control', 'private, no-store')
         ->header('Pragma', 'no-cache');
 })
-    ->middleware(['auth', 'password.confirm'])
+    ->middleware('auth')
     ->name('account.security');
 
 require __DIR__.'/user-management.php';
