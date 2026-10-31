@@ -4,11 +4,11 @@
 Treatment Plans | NACSA Toolkit
 @endsection
 @section('page-label', 'Assessments')
-@section('page-class', '')
+@section('page-class', ' assessment-workspace')
 
 @section('content')
 
-<div class="page-heading"><div><h1>Treatment plans — Assessment #{{ $assessment->id }}</h1></div></div>
+<div class="page-heading"><div><h1>Treatment plans for Assessment #{{ $assessment->id }}</h1></div></div>
 @include('partials.assessment-navigation', ['activeTab' => 'treatments'])
 
 
@@ -16,11 +16,7 @@ Treatment Plans | NACSA Toolkit
 
     
 
-    <p>
-        Asset: <strong>{{ $assessment->asset_code }}</strong><br>
-        Assessment status: <strong>{{ ucfirst($assessment->status) }}</strong><br>
-        Revision: {{ $assessment->revision }}
-    </p>
+    @include('partials.assessment-context')
 
     @if (session('success'))
         <div class="success" role="status">
@@ -83,14 +79,14 @@ Treatment Plans | NACSA Toolkit
                     </label>
 
                     <label>
-                        Start date — optional
+                        Start date (optional)
                         <input type="date"
                                name="starts_on"
                                value="{{ old('starts_on') }}">
                     </label>
 
                     <label>
-                        Due date — optional
+                        Due date (optional)
                         <input type="date"
                                name="due_on"
                                value="{{ old('due_on') }}">
@@ -108,7 +104,7 @@ Treatment Plans | NACSA Toolkit
 
                 <p>
                     <label>
-                        Planned controls or actions — optional
+                        Planned controls or actions (optional)
                         <textarea name="planned_controls"
                                   maxlength="5000">{{ old('planned_controls') }}</textarea>
                     </label>
@@ -123,28 +119,27 @@ Treatment Plans | NACSA Toolkit
         <h2>Saved treatment plans</h2>
 
         @forelse ($treatments as $treatment)
-            <article>
-                <h3>
-                    Plan #{{ $treatment->id }} — Revision {{ $treatment->assessment_revision ?? 'unknown' }}
-                    — {{ $options[$treatment->option] ?? ucfirst($treatment->option) }}
-                </h3>
+            <article class="treatment-card">
+                @php
+                    $panel = $residualPanels->get($treatment->id);
+                    $historical = (int) $treatment->assessment_revision !== (int) $assessment->revision;
+                    $verified = $panel && $panel['review'] && $panel['review']->decision === 'verified';
+                    $ready = $treatment->implemented_at !== null && $treatment->residual_result !== null;
+                @endphp
+                <div class="panel-heading">
+                    <div><p class="eyebrow">{{ $options[$treatment->option] ?? ucfirst($treatment->option) }}</p><h3>Treatment Plan {{ $treatment->id }}</h3></div>
+                    <span class="verification-badge {{ $historical ? 'verification-neutral' : ($verified ? 'verification-complete' : 'verification-pending') }}">{{ $historical ? 'Historical' : ($verified ? 'Verified' : ($ready ? 'Awaiting Verification' : 'Awaiting Implementation')) }}</span>
+                </div>
 
-                <p>
-                    <strong>Responsible person:</strong>
-                    {{ $treatment->responsible_person }}<br>
-
-                    <strong>Start date:</strong>
-                    {{ $treatment->starts_on ?? 'Not set' }}<br>
-
-                    <strong>Due date:</strong>
-                    {{ $treatment->due_on ?? 'Not set' }}<br>
-
-                    <strong>Implementation:</strong>
-                    {{ $treatment->implemented_at ? 'Recorded' : 'Not yet recorded' }}
-                </p>
+                <dl class="plan-metadata">
+                    <div><dt>Responsible Person</dt><dd>{{ $treatment->responsible_person }}</dd></div>
+                    <div><dt>Start Date</dt><dd>{{ $treatment->starts_on ?? 'Not set' }}</dd></div>
+                    <div><dt>Due Date</dt><dd>{{ $treatment->due_on ?? 'Not set' }}</dd></div>
+                    <div><dt>Implementation</dt><dd>{{ $treatment->implemented_at ? 'Recorded' : 'Not recorded' }}</dd></div>
+                </dl>
 
                 @if ((int) $treatment->assessment_revision !== (int) $assessment->revision)
-                    <p>Historical plan — view only. A new plan is required for the current revision.</p>
+                    <p>Historical record. Revision {{ $treatment->assessment_revision ?? 'unknown' }}.</p>
                 @endif
 
                 <h4>Rationale</h4>
@@ -153,14 +148,15 @@ Treatment Plans | NACSA Toolkit
                 <h4>Planned controls or actions</h4>
                 <p class="text">{{ $treatment->planned_controls ?? 'Not provided.' }}</p>
 
-                <p>
-                    <a href="{{ route('assessments.implementation', [
+                <div class="plan-actions">
+                    <a class="secondary-action" href="{{ route('assessments.implementation', [
                         'assessment' => $assessment->id,
                         'treatment' => $treatment->id,
                     ]) }}">
-                        View implementation and residual risk
+                        {{ $historical || !$canManage || $assessment->status !== 'verified' || $assessment->asset_deleted_at !== null || $treatment->implemented_at ? 'View Implementation' : 'Record Implementation' }}
                     </a>
-                </p>
+                <a class="secondary-action" href="{{ route('assessments.treatment-review', ['assessment' => $assessment->id, 'treatment' => $treatment->id]) }}">{{ $verified ? 'View Review Decision' : 'Verification Details' }}</a></div>
+
             </article>
         @empty
             <p>No treatment plans have been added.</p>

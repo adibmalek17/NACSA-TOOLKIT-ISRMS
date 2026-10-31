@@ -4,11 +4,11 @@
 Treatment Implementation | NACSA Toolkit
 @endsection
 @section('page-label', 'Assessments')
-@section('page-class', '')
+@section('page-class', ' assessment-workspace')
 
 @section('content')
 
-<div class="page-heading"><div><h1>Implementation — Plan #{{ $treatment->id }}</h1></div></div>
+<div class="page-heading"><div><h1>Treatment Implementation #{{ $treatment->id }}</h1></div></div>
 @include('partials.assessment-navigation', ['activeTab' => 'treatments'])
 
 
@@ -21,13 +21,7 @@ Treatment Implementation | NACSA Toolkit
 
     
 
-    <p>
-        Assessment: #{{ $assessment->id }}<br>
-        Asset: <strong>{{ $assessment->asset_code }}</strong><br>
-        Profile: {{ $assessment->profile }}<br>
-        Treatment option: {{ ucfirst($treatment->option) }}<br>
-        Responsible person: {{ $treatment->responsible_person }}
-    </p>
+    @include('partials.assessment-context')
 
     @if (session('success'))
         <div class="success" role="status">
@@ -87,7 +81,7 @@ Treatment Implementation | NACSA Toolkit
                     <thead>
                         <tr>
                             <th>Result</th>
-                            <th>Verified assessment</th>
+                            <th>Inherent Risk</th>
                             <th>Residual risk</th>
                         </tr>
                     </thead>
@@ -99,8 +93,8 @@ Treatment Implementation | NACSA Toolkit
                         </tr>
                         <tr>
                             <th>Risk label</th>
-                            <td>{{ $baseline['result']['label'] ?? 'Unavailable' }}</td>
-                            <td>{{ $treatment->residual_result['label'] ?? 'Unavailable' }}</td>
+                            <td>@include('partials.risk-badge', ['riskResult' => $baseline['result'] ?? [], 'riskProfile' => $assessment->profile])</td>
+                            <td>@include('partials.risk-badge', ['riskResult' => $treatment->residual_result ?? [], 'riskProfile' => $assessment->profile])</td>
                         </tr>
                     </tbody>
                 </table>
@@ -113,7 +107,7 @@ Treatment Implementation | NACSA Toolkit
                     <thead>
                         <tr>
                             <th>Input</th>
-                            <th>Verified assessment</th>
+                            <th>Inherent Risk</th>
                             <th>Residual risk</th>
                         </tr>
                     </thead>
@@ -130,11 +124,11 @@ Treatment Implementation | NACSA Toolkit
             </div>
 
           <p>
-    <a href="{{ route('assessments.treatment-review', [
+    <a class="secondary-action" href="{{ route('assessments.treatment-review', [
         'assessment' => $assessment->id,
         'treatment' => $treatment->id,
     ]) }}">
-        View verification status or review this residual risk
+        Verification Details
     </a>
 </p>
         </section>
@@ -178,11 +172,11 @@ Treatment Implementation | NACSA Toolkit
                         and any supporting evidence references.
                     </p>
 
-                    <h3>Residual scoring inputs</h3>
+                    <h3>Residual Risk Scoring</h3>
 
                     <p>
                         Enter whole numbers from 1 to {{ $maximum }}.
-                        Values start with the verified assessment inputs.
+                        Assess the remaining risk after existing controls and this plan’s implemented actions. Values start with the assessment inputs; review every value.
                         Change them only where the implemented controls
                         justify a different rating.
                     </p>
@@ -207,7 +201,6 @@ Treatment Implementation | NACSA Toolkit
                         residual risk. This record cannot be edited through
                         this form after saving.
                     </p>
-
                     <button type="submit">
                         Save implementation and residual risk
                     </button>

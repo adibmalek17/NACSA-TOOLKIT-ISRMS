@@ -4,7 +4,7 @@
 Risk Assessments | NACSA Toolkit
 @endsection
 @section('page-label', 'Assessments')
-@section('page-class', 'assessment-list-page')
+@section('page-class', 'assessment-list-page assessment-workspace')
 
 @section('content')
 @php
@@ -12,9 +12,9 @@ Risk Assessments | NACSA Toolkit
 @endphp
         <div class="page-heading">
             <div>
-                <p class="eyebrow">Your risk workspace</p>
+                
                 <h1>Risk assessments</h1>
-                <p>Create and review assessments for your assigned departments.</p>
+                
             </div>
             <a class="button" href="#saved-assessments">Saved assessments <svg aria-hidden="true"><use href="#icon-arrow"/></svg></a>
         </div>
@@ -133,7 +133,7 @@ Risk Assessments | NACSA Toolkit
 
                 <p>
                     <label>
-                        Existing controls — optional
+                        Existing controls (optional)
                         <textarea
                             name="existing_controls"
                             maxlength="5000"
@@ -141,7 +141,8 @@ Risk Assessments | NACSA Toolkit
                     </label>
                 </p>
 
-                <h3>Scoring inputs</h3>
+                <h3>Inherent Risk Scoring</h3>
+                <p class="hint">Rate the risk before any controls. Existing controls are recorded for context and must not reduce these scores.</p>
 
                 <p class="hint" id="score-hint">
                     Use 1–3 for nacsa-3-2024 and usim-2026.
@@ -210,11 +211,8 @@ Risk Assessments | NACSA Toolkit
                     </div>
                 </div>
 
-                <p class="hint">
-                    Saving calculates the result and creates a draft assessment.
-                </p>
-
-                <button type="submit">Calculate and save draft</button>
+    
+                <button type="submit">Save Assessment</button>
             </form>
         @elseif ($canCreate)
             <p>
@@ -292,8 +290,8 @@ Risk Assessments | NACSA Toolkit
                         <th scope="col">Department</th>
                         <th scope="col">Date</th>
                         <th scope="col">Profile</th>
-                        <th scope="col">Score</th>
-                        <th scope="col">Risk level</th>
+                        <th scope="col">Inherent risk</th>
+                        <th scope="col">Residual risk</th>
                         <th scope="col">Status</th>
                         <th scope="col">Actions</th>
                     </tr>
@@ -313,8 +311,20 @@ Risk Assessments | NACSA Toolkit
                             <td>{{ $assessment->department_name }}</td>
                             <td>{{ $assessment->assessed_on }}</td>
                             <td>{{ $assessment->profile }}</td>
-                            <td>{{ $assessment->result['score'] ?? '—' }}</td>
-                            <td>{{ $assessment->result['label'] ?? '—' }}</td>
+                            <td>
+                                <strong>{{ $assessment->result['score'] ?? 'Not assessed' }}</strong>
+                            </td>
+                            <td>
+                                @forelse ($riskComparisons->get($assessment->id, []) as $comparison)
+                                    <div>Plan #{{ $comparison['plan_id'] }}: {{ $comparison['result']['score'] ?? 'Not assessed' }}
+                                        @if ($comparison['result'] !== null)
+                                            <br><small>{{ $comparison['status'] }}</small>
+                                        @endif
+                                    </div>
+                                @empty
+                                    Not assessed
+                                @endforelse
+                            </td>
                            <td>
     <span class="status-badge status-{{ $assessment->status }}">{{ ucfirst($assessment->status) }}</span>
 </td>
@@ -395,5 +405,5 @@ Risk Assessments | NACSA Toolkit
         updateScoreFields();
     }
 </script>
-<script src="{{ asset('js/assessment-excel-fill.js') }}" defer></script>
+<script src="{{ asset('js/assessment-excel-fill.js').'?v=scoring-form-2' }}" defer></script>
 @endsection

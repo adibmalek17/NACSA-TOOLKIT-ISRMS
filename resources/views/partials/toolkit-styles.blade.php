@@ -890,4 +890,66 @@ body.sidebar-closed .workspace { margin-left:0; }
     .workspace { margin-left:0; }
 }
 @media print { .sidebar-toggle { display:none !important; } }
+
+/* Risk bands retain their text labels for accessibility. */
+.risk-badge { display:inline-flex; align-items:center; padding:6px 12px; border:1px solid; border-radius:6px; font-size:14px; line-height:1.4; font-weight:600; white-space:nowrap; }
+.risk-badge.risk-high, .result.risk-high { background:#fff1f2; color:#991b1b; border-color:#f5b6bd; }
+.risk-badge.risk-medium, .result.risk-medium { background:#fff8d6; color:#755600; border-color:#e8cd63; }
+.risk-badge.risk-low, .result.risk-low { background:#eaf7ee; color:#166534; border-color:#a4d7b2; }
+.risk-badge.risk-neutral, .result.risk-neutral { background:#f1f5f9; color:#475569; border-color:#cbd5e1; }
+.result[class*="risk-"] { border:1px solid; border-left-width:5px; }
+.result[class*="risk-"] .score { color:inherit; }
+.risk-plan { display:block; margin-top:5px; color:#526974; font-weight:400; }
+.risk-score { font-weight:700; font-variant-numeric:tabular-nums; }
+
+/* Assessment workspace */
+.assessment-workspace .page-heading { margin-bottom:24px; }
+.assessment-workspace .assessment-nav { padding:6px; gap:6px; border-radius:10px; margin-bottom:24px; }
+.assessment-workspace .assessment-nav a { border-radius:6px; padding:12px 20px; font-weight:600; }
+.assessment-workspace .assessment-nav a[aria-current="page"] { background:#123641; color:#fff; }
+.assessment-workspace section { border:1px solid #dce5eb; border-radius:12px; margin-top:24px; padding:28px; background:#fff; }
+.assessment-workspace h2 { font-size:22px; margin:0 0 20px; }
+.assessment-workspace h3 { font-size:18px; margin:24px 0 14px; }
+.assessment-workspace h4 { margin:22px 0 10px; }
+.assessment-workspace table { font-variant-numeric:tabular-nums; }
+.assessment-workspace th, .assessment-workspace td { padding:16px 18px; vertical-align:middle; }
+.assessment-workspace .table-wrap + h3 { margin-top:30px; }
+.assessment-workspace form > button { margin-top:20px; }
+.assessment-context { display:flex; flex-wrap:wrap; gap:24px 48px; padding:20px 24px; background:#edf3f5; border:1px solid #dce5eb; border-radius:10px; margin:20px 0; }
+.assessment-context div { min-width:110px; }
+.assessment-context span { display:block; color:#526974; font-size:13px; margin-bottom:6px; }
+.assessment-context strong { font-size:15px; color:#183540; }
+.panel-heading { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; margin-bottom:20px; }
+.panel-heading h2, .panel-heading h3, .panel-heading p { margin:0; }
+.panel-heading .eyebrow { margin-bottom:8px; }
+.assessment-workspace .treatment-card { margin-top:20px; padding:24px; border:1px solid #dce5eb; border-radius:10px; background:#fff; }
+.assessment-workspace .treatment-card .decision-panel { background:#f7fafb; margin-top:24px; }
+.verification-badge { padding:7px 12px; border-radius:6px; font-weight:600; font-size:13px; border:1px solid; }
+.verification-complete { background:#eaf7ee; color:#166534; border-color:#a4d7b2; }
+.verification-pending { background:#fff8d6; color:#755600; border-color:#e8cd63; }
+.verification-neutral { background:#edf2f7; color:#475569; border-color:#cbd5e1; }
+.assessment-workspace .secondary-action { display:inline-flex; align-items:center; justify-content:center; padding:10px 16px; min-height:42px; border:1px solid #b9cbd3; border-radius:6px; text-decoration:none; color:#183540; background:#fff; font-weight:600; }
+.assessment-workspace .secondary-action:hover { background:#edf3f5; }
+.assessment-empty { padding:24px; background:#f7fafb; border:1px dashed #bccbd3; border-radius:8px; color:#526974; }
+.assessment-workspace .report-actions { display:flex; justify-content:flex-end; margin:20px 0; }
+@media(max-width:700px) { .assessment-workspace section, .assessment-workspace .treatment-card { padding:18px; } .assessment-context { gap:16px; } .assessment-workspace .assessment-nav { overflow-x:auto; flex-wrap:nowrap; } .assessment-nav a { white-space:nowrap; } }
+@media print { .report-actions { display:none !important; } .assessment-workspace section { break-inside:auto; } .assessment-workspace tr { break-inside:avoid; } }
+
+.plan-metadata { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:20px; margin:20px 0; padding:20px 0; border-top:1px solid #e2e9ed; border-bottom:1px solid #e2e9ed; }
+.plan-metadata dt { color:#526974; font-size:13px; font-weight:500; }
+.plan-metadata dd { margin:7px 0 0; font-weight:600; overflow-wrap:anywhere; }
+.plan-actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:24px; }
+@media(max-width:900px) { .plan-metadata { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media(max-width:500px) { .plan-metadata { grid-template-columns:1fr; } }
+@media print { #export-excel { display:none !important; } }
+
+.report-detail-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:24px; align-items:start; }
+.report-detail-grid > section { min-width:0; }
+.report-details-table { table-layout:fixed; width:100%; }
+.report-details-table th:first-child { width:36%; }
+.report-details-table td, .report-details-table th { overflow-wrap:anywhere; }
+.report-value { white-space:pre-wrap; }
+.current-review-decision { margin-top:20px; padding:16px 20px; border-left:3px solid #087c72; background:#f4f8f9; }
+@media(max-width:1100px) { .report-detail-grid { grid-template-columns:1fr; gap:0; } }
+@media print { .report-detail-grid { display:block; } }
 </style>

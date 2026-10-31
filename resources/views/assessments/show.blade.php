@@ -4,7 +4,7 @@
 Assessment #{{ $assessment->id }} | NACSA Toolkit
 @endsection
 @section('page-label', 'Assessments')
-@section('page-class', '')
+@section('page-class', ' assessment-workspace')
 
 @section('content')
 @php
@@ -14,9 +14,10 @@ Assessment #{{ $assessment->id }} | NACSA Toolkit
         <div class="page-heading"><div>
             <p class="eyebrow">Assessment overview</p>
             <h1>Assessment #{{ $assessment->id }}</h1>
-            <p>{{ $assessment->asset_code }} — {{ $assessment->asset_name }}</p>
+            <p>{{ $assessment->asset_code }}<br>{{ $assessment->asset_name }}</p>
         </div></div>
 @include('partials.assessment-navigation', ['activeTab' => 'overview'])
+@include('partials.risk-comparison')
 
 
     @if ($assessment->asset_deleted_at)
@@ -87,7 +88,7 @@ Assessment #{{ $assessment->id }} | NACSA Toolkit
 
     <div class="overview-columns">
     <section class="overview-panel">
-        <h2>Saved scoring inputs</h2>
+        <h2>Inherent Risk Inputs</h2>
 
         <table>
             <thead>
@@ -120,55 +121,33 @@ Assessment #{{ $assessment->id }} | NACSA Toolkit
     </section>
 
     <section class="overview-panel">
-        <h2>Saved result</h2>
+        <h2>Inherent Risk Result</h2>
 
-        <div class="result">
+        <div class="result risk-{{ \App\Services\RiskPresentation::tone($assessment->result, $assessment->profile) }}">
             <p>Risk score</p>
-            <p class="score">{{ $assessment->result['score'] ?? '—' }}</p>
+            <p class="score">{{ $assessment->result['score'] ?? 'Not available' }}</p>
             <p>
                 Risk level:
-                <strong>{{ $assessment->result['label'] ?? '—' }}</strong>
+                @include('partials.risk-badge', ['riskResult' => $assessment->result, 'riskProfile' => $assessment->profile])
             </p>
         </div>
 
         <dl class="grid">
             <div>
                 <dt>CIA total</dt>
-                <dd>{{ $assessment->result['ciaTotal'] ?? '—' }}</dd>
+                <dd>{{ $assessment->result['ciaTotal'] ?? 'Not available' }}</dd>
             </div>
 
             <div>
                 <dt>Asset value</dt>
-                <dd>{{ $assessment->result['asset'] ?? '—' }}</dd>
-            </div>
-
-            <div>
-                <dt>Raw impact</dt>
-                <dd>{{ $assessment->result['impactRaw'] ?? '—' }}</dd>
+                <dd>{{ $assessment->result['asset'] ?? 'Not available' }}</dd>
             </div>
 
             <div>
                 <dt>Impact value</dt>
-                <dd>{{ $assessment->result['impact'] ?? '—' }}</dd>
-            </div>
-
-            <div>
-                <dt>Risk level number</dt>
-                <dd>{{ $assessment->result['level'] ?? '—' }}</dd>
-            </div>
-
-            <div>
-                <dt>Profile override applied</dt>
-                <dd>
-                    {{ ($assessment->result['override'] ?? false) ? 'Yes' : 'No' }}
-                </dd>
+                <dd>{{ $assessment->result['impact'] ?? 'Not available' }}</dd>
             </div>
         </dl>
-
-        <p class="hint">
-            These are the results stored when this assessment was saved.
-            Opening this page does not recalculate them.
-        </p>
     </section>
 </div>
         

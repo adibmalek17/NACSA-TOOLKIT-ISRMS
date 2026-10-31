@@ -170,6 +170,7 @@ final class RiskAssessmentCorrectionController extends Controller
                 'risk_owner' => $record->risk_owner,
                 'status' => $record->status,
                 'revision' => $record->revision,
+                'risk_basis' => $record->risk_basis,
                 'inputs' => json_decode(
                     $record->inputs,
                     true,
@@ -197,6 +198,7 @@ final class RiskAssessmentCorrectionController extends Controller
                     'engine_version' => $result['version'],
                     'inputs' => json_encode($inputs, JSON_THROW_ON_ERROR),
                     'result' => json_encode($result, JSON_THROW_ON_ERROR),
+                    'risk_basis' => 'inherent',
                     'status' => 'draft',
                     'revision' => $revision,
                     'updated_at' => $now,
@@ -210,6 +212,7 @@ final class RiskAssessmentCorrectionController extends Controller
                     'department_id' => $record->department_id,
                     'previous_snapshot' => $previousSnapshot,
                     'new_revision' => $revision,
+                    'risk_basis' => 'inherent',
                     'from_status' => $record->status,
                     'to_status' => 'draft',
                 ], JSON_THROW_ON_ERROR),

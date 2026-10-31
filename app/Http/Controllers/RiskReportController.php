@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Services\RiskComparison;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -97,6 +98,7 @@ final class RiskReportController extends Controller
 
         return view('assessments.report', [
             'assessment' => $record,
+            'riskComparison' => RiskComparison::forAssessments(collect([$record]))->get($record->id, []),
             'assessmentReviews' => $reviews
                 ->whereNull('risk_treatment_id'),
             'residualReviews' => $reviews

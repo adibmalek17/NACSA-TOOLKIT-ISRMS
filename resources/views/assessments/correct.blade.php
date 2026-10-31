@@ -4,7 +4,7 @@
 Correct Assessment | NACSA Toolkit
 @endsection
 @section('page-label', 'Assessments')
-@section('page-class', '')
+@section('page-class', ' assessment-workspace')
 
 @section('content')
 
@@ -106,13 +106,14 @@ Correct Assessment | NACSA Toolkit
 
             <p>
                 <label>
-                    Existing controls — optional
+                    Existing controls (optional)
                     <textarea name="existing_controls"
                               maxlength="5000">{{ old('existing_controls', $assessment->existing_controls) }}</textarea>
                 </label>
             </p>
 
-            <h2>Scoring inputs</h2>
+            <h2>Inherent Risk Scoring</h2>
+            <p>Rate the risk before considering any controls. Review every score, including values loaded from an older assessment.</p>
             <p>Enter whole numbers from 1 to {{ $maximum }}.</p>
 
             <div class="grid">
@@ -135,6 +136,7 @@ Correct Assessment | NACSA Toolkit
                 {{ $assessment->revision + 1 }}.
                 You can then submit it for review.
             </p>
+
 
             <div class="actions">
                 <button type="submit">Save corrected draft</button>

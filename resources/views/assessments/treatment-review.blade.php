@@ -4,11 +4,11 @@
 Residual Risk Review | NACSA Toolkit
 @endsection
 @section('page-label', 'Assessments')
-@section('page-class', '')
+@section('page-class', ' assessment-workspace')
 
 @section('content')
 
-<div class="page-heading"><div><h1>Residual risk review — Plan #{{ $treatment->id }}</h1></div></div>
+<div class="page-heading"><div><h1>Residual Risk Review #{{ $treatment->id }}</h1></div></div>
 @include('partials.assessment-navigation', ['activeTab' => 'treatments'])
 
 
@@ -21,12 +21,7 @@ Residual Risk Review | NACSA Toolkit
 
     
 
-    <p>
-        Assessment: #{{ $assessment->id }}<br>
-        Revision: {{ $assessment->revision }}<br>
-        Asset: <strong>{{ $assessment->asset_code }}</strong><br>
-        Profile: {{ $assessment->profile }}
-    </p>
+    @include('partials.assessment-context')
 
     @if (session('success'))
         <div class="success" role="status">{{ session('success') }}</div>
@@ -54,7 +49,7 @@ Residual Risk Review | NACSA Toolkit
                     <thead>
                         <tr>
                             <th>Result</th>
-                            <th>Verified assessment</th>
+                            <th>Inherent Risk</th>
                             <th>Residual risk</th>
                         </tr>
                     </thead>
@@ -66,8 +61,8 @@ Residual Risk Review | NACSA Toolkit
                         </tr>
                         <tr>
                             <th>Risk label</th>
-                            <td>{{ $baseline['result']['label'] ?? 'Unavailable' }}</td>
-                            <td>{{ $treatment->residual_result['label'] }}</td>
+                            <td>@include('partials.risk-badge', ['riskResult' => $baseline['result'] ?? [], 'riskProfile' => $assessment->profile])</td>
+                            <td>@include('partials.risk-badge', ['riskResult' => $treatment->residual_result ?? [], 'riskProfile' => $assessment->profile])</td>
                         </tr>
                     </tbody>
                 </table>
@@ -101,66 +96,6 @@ Residual Risk Review | NACSA Toolkit
         @endif
     </section>
 
-    <section>
-        <h2>Review decision</h2>
-
-        @if ($review)
-            <p>
-                Decision: <strong>{{ ucfirst($review->decision) }}</strong><br>
-                Reviewer: {{ $review->reviewer_name ?? 'Unavailable' }}<br>
-                Assessment revision: {{ $review->revision }}<br>
-                Recorded at: {{ $review->created_at }}
-            </p>
-
-            <p class="text">{{ $review->comment }}</p>
-        @elseif (!$isCurrentTreatment)
-            <p>This historical plan cannot receive a review for the current revision.</p>
-        @elseif ($assessment->asset_deleted_at !== null)
-            <p>This asset is archived. Reviews are view only.</p>
-        @elseif ($assessment->status !== 'verified')
-            <p>The assessment must be verified first.</p>
-        @elseif (
-            $treatment->implemented_at === null
-            || $treatment->residual_inputs === null
-            || $treatment->residual_result === null
-        )
-            <p>Implementation and residual risk must be recorded first.</p>
-        @elseif (!$canReview)
-            <p>
-                An independent department Reviewer must verify this result.
-                The assessor and the person who recorded implementation
-                cannot verify it themselves.
-            </p>
-        @else
-            <p>
-                Check the implementation evidence and scoring inputs before
-                verifying. If corrections are needed, leave this record
-                unverified; this page currently supports verification only.
-            </p>
-
-            <form method="POST"
-                  action="{{ route('assessments.treatment-review.store', [
-                      'assessment' => $assessment->id,
-                      'treatment' => $treatment->id,
-                  ]) }}">
-                @csrf
-
-                <input type="hidden"
-                       name="revision"
-                       value="{{ $assessment->revision }}">
-
-                <label>
-                    Review comment
-                    <textarea name="comment"
-                              maxlength="5000"
-                              required>{{ old('comment') }}</textarea>
-                </label>
-
-                <button type="submit">
-                    Verify implementation and residual risk
-                </button>
-            </form>
-        @endif
-    </section>
+    @include('partials.residual-decision')
 
 @endsection

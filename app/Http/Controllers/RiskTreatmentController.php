@@ -63,6 +63,7 @@ final class RiskTreatmentController extends Controller
         return view('assessments.treatments', [
             'assessment' => $record,
             'treatments' => $treatments,
+            'residualPanels' => collect(\App\Services\ResidualReviewPresentation::currentPlans($record, (int) $request->user()->id))->keyBy(fn ($panel) => $panel['treatment']->id),
             'options' => self::OPTIONS,
             'canManage' => $this->canManage($request, $record),
         ]);

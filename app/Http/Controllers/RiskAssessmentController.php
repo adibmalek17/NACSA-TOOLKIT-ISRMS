@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 
 use App\Domain\Risk\RiskCalculator;
 use App\Models\RiskAsset;
+use App\Services\RiskComparison;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
@@ -72,6 +73,7 @@ final class RiskAssessmentController extends Controller
         });
 
         return view('assessments.index', [
+            'riskComparisons' => RiskComparison::forAssessments($assessments->getCollection()),
             'assets' => $assets,
             'assessments' => $assessments,
             'profiles' => self::PROFILES,
@@ -167,8 +169,8 @@ final class RiskAssessmentController extends Controller
                 fwrite($output, "\xEF\xBB\xBF");
                 fputcsv($output, [
                     'Assessment ID', 'Asset code', 'Asset name', 'Department',
-                    'Assessment date', 'Profile', 'Risk score', 'Risk level',
-                    'Status', 'Revision', 'Risk owner',
+                    'Assessment date', 'Profile', 'Initial risk score', 'Initial risk level',
+                    'Status', 'Revision', 'Risk owner', 'Scoring basis', 'Inherent score', 'Inherent level', 'Residual risk by current-revision plan',
                 ], ',', '"', '');
 
                 // Export all matching rows, not only the current table page.
@@ -176,6 +178,9 @@ final class RiskAssessmentController extends Controller
                     $result = json_decode(
                         $assessment->result, true, 512, JSON_THROW_ON_ERROR
                     );
+                    $comparison = RiskComparison::forAssessments(collect([$assessment]))->get($assessment->id, []);
+                    $residual = collect($comparison)->map(fn ($item) => 'Plan #'.$item['plan_id'].': '.
+                        ($item['result'] === null ? 'Not assessed' : $item['result']['score'].' / '.($item['result']['label'] ?? '').' / '.$item['status']))->implode('; ');
                     $row = [
                         $assessment->id,
                         $assessment->asset_code,
@@ -188,6 +193,10 @@ final class RiskAssessmentController extends Controller
                         ucfirst($assessment->status),
                         $assessment->revision,
                         $assessment->risk_owner,
+                        RiskComparison::basisLabel($assessment),
+                        $assessment->risk_basis === 'inherent' ? ($result['score'] ?? '') : '',
+                        $assessment->risk_basis === 'inherent' ? ($result['label'] ?? '') : '',
+                        $residual ?: 'Not assessed',
                     ];
                     fputcsv(
                         $output,
@@ -272,6 +281,7 @@ final class RiskAssessmentController extends Controller
 
         return view('assessments.show', [
             'assessment' => $record,
+            'riskComparison' => RiskComparison::forAssessments(collect([$record]))->get($record->id, []),
         ]);
     }
 
@@ -368,6 +378,7 @@ final class RiskAssessmentController extends Controller
                 'risk_owner' => $validated['risk_owner'],
                 'inputs' => json_encode($inputs, JSON_THROW_ON_ERROR),
                 'result' => json_encode($result, JSON_THROW_ON_ERROR),
+                'risk_basis' => 'inherent',
                 'status' => 'draft',
                 'revision' => 1,
                 'created_at' => $now,
@@ -383,6 +394,7 @@ final class RiskAssessmentController extends Controller
                     'department_id' => $currentAsset->department_id,
                     'profile' => $profile,
                     'engine_version' => $result['version'],
+                    'risk_basis' => 'inherent',
                 ], JSON_THROW_ON_ERROR),
                 'created_at' => $now,
             ]);

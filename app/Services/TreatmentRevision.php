@@ -18,6 +18,7 @@ final class TreatmentRevision
     {
         if (self::isCurrent($assessment, $treatment)) {
             return [
+                'risk_basis' => $assessment->risk_basis ?? null,
                 'inputs' => is_array($assessment->inputs) ? $assessment->inputs : json_decode($assessment->inputs, true, 512, JSON_THROW_ON_ERROR),
                 'result' => is_array($assessment->result) ? $assessment->result : json_decode($assessment->result, true, 512, JSON_THROW_ON_ERROR),
             ];
@@ -29,10 +30,10 @@ final class TreatmentRevision
                 $metadata = json_decode($event->metadata, true, 512, JSON_THROW_ON_ERROR);
                 $snapshot = $metadata['previous_snapshot'] ?? [];
                 if ((int) ($snapshot['revision'] ?? 0) === (int) $treatment->assessment_revision) {
-                    return ['inputs' => $snapshot['inputs'] ?? [], 'result' => $snapshot['result'] ?? []];
+                    return ['risk_basis' => $snapshot['risk_basis'] ?? null, 'inputs' => $snapshot['inputs'] ?? [], 'result' => $snapshot['result'] ?? []];
                 }
             }
         }
-        return ['inputs' => [], 'result' => []];
+        return ['risk_basis' => null, 'inputs' => [], 'result' => []];
     }
 }

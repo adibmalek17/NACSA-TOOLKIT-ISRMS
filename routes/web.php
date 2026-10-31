@@ -105,12 +105,22 @@ Route::middleware(['auth', 'mfa.enrolled'])->group(function () {
             })
             ->count();
 
+        $implementedWithScores = (clone $treatmentQuery)
+            ->whereNotNull('risk_treatments.implemented_at')
+            ->whereNotNull('risk_treatments.residual_inputs')
+            ->whereNotNull('risk_treatments.residual_result')
+            ->count();
+        $treatmentTotal = (clone $treatmentQuery)->count();
+
         $stats = [
             'active_assets' => $activeAssets,
             'draft' => (int) ($assessmentCounts['draft'] ?? 0),
             'submitted' => (int) ($assessmentCounts['submitted'] ?? 0),
             'returned' => (int) ($assessmentCounts['returned'] ?? 0),
             'verified' => (int) ($assessmentCounts['verified'] ?? 0),
+            'treatment_total' => $treatmentTotal,
+            'treatment_verified' => $implementedWithScores - $awaitingResidualVerification,
+            'treatment_incomplete' => $treatmentTotal - $awaitingImplementation - $implementedWithScores,
             'awaiting_implementation' => $awaitingImplementation,
             'awaiting_residual_verification' => $awaitingResidualVerification,
         ];

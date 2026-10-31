@@ -80,6 +80,7 @@ final class RiskReviewController extends Controller
                     && (int) $record->assessor_id === (int) $request->user()->id),
             'canReview' => $canReview,
             'reviews' => $reviews,
+            'residualPanels' => \App\Services\ResidualReviewPresentation::currentPlans($record, (int) $request->user()->id),
         ]);
     }
 

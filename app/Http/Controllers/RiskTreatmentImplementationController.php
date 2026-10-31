@@ -215,6 +215,8 @@ final class RiskTreatmentImplementationController extends Controller
                     'assessment_revision' => $record->revision,
                     'profile' => $profile,
                     'engine_version' => $result['version'],
+                    'risk_basis' => 'residual',
+                    'baseline_risk_basis' => $record->risk_basis,
                     'residual_score' => $result['score'],
                     'residual_level' => $result['level'],
                 ], JSON_THROW_ON_ERROR),

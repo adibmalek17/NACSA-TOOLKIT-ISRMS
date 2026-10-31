@@ -4,11 +4,11 @@
 Assessment Activity | NACSA Toolkit
 @endsection
 @section('page-label', 'Assessments')
-@section('page-class', '')
+@section('page-class', ' assessment-workspace')
 
 @section('content')
 
-<div class="page-heading"><div><h1>Activity history — Assessment #{{ $assessment->id }}</h1></div></div>
+<div class="page-heading"><div><h1>Activity history for Assessment #{{ $assessment->id }}</h1></div></div>
 @include('partials.assessment-navigation', ['activeTab' => 'history'])
 
 

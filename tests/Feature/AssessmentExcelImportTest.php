@@ -52,7 +52,7 @@ final class AssessmentExcelImportTest extends TestCase
             $t->date('assessed_on'); $t->string('profile'); $t->string('engine_version');
             $t->text('threat'); $t->text('vulnerability'); $t->text('existing_controls')->nullable();
             $t->string('risk_owner'); $t->text('inputs'); $t->text('result'); $t->string('status');
-            $t->integer('revision'); $t->timestamps();
+            $t->integer('revision'); $t->string('risk_basis')->nullable(); $t->timestamps();
         });
         Schema::create('risk_audit_events', function (Blueprint $t) {
             $t->id(); $t->unsignedBigInteger('actor_id'); $t->unsignedBigInteger('risk_assessment_id')->nullable();
@@ -137,12 +137,13 @@ final class AssessmentExcelImportTest extends TestCase
         $this->assertDatabaseCount('risk_assessments', 0);
         $fields['likelihood'] = 1;
         $fields['risk_owner'] = 'Edited owner';
-        $this->post(route('assessments.store'), $fields + ['risk_asset_id' => 1, 'profile' => 'usim-2026'])
+        $this->post(route('assessments.store'), $fields + ['risk_asset_id' => 1, 'profile' => 'usim-2026', ])
             ->assertSessionHasNoErrors()->assertRedirect(route('assessments.index'));
         $this->assertDatabaseCount('risk_assessments', 1);
         $saved = DB::table('risk_assessments')->first();
         $this->assertSame('Edited owner', $saved->risk_owner);
         $this->assertSame('draft', $saved->status);
+        $this->assertSame('inherent', $saved->risk_basis);
         $this->assertSame(24, json_decode($saved->result, true)['score']);
     }
 

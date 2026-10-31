@@ -42,6 +42,7 @@ final class AssessmentLifecycleTest extends TestCase
         (require database_path('migrations/2026_10_10_000001_create_risk_tables.php'))->up();
         (require database_path('migrations/2026_10_19_093639_add_risk_treatment_id_to_risk_reviews_table.php'))->up();
         (require database_path('migrations/2026_10_29_000001_add_assessment_revision_to_risk_treatments.php'))->up();
+        (require database_path('migrations/2026_10_31_000001_add_risk_basis_to_assessments.php'))->up();
         DB::table('departments')->insert([
             ['id' => 1, 'code' => 'DEV', 'name' => 'Development'],
             ['id' => 2, 'code' => 'OTHER', 'name' => 'Other'],

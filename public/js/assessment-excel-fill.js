@@ -108,7 +108,7 @@
             for (const key of (selectedProfile === 'usim-2026' ? ['loss'] : ['operations', 'financial', 'reputation'])) {
                 form.elements.namedItem(key).value = '';
             }
-            status.textContent = 'Excel row ' + json.row + ' filled in. Edit any values below, then click Calculate and save draft. Nothing has been saved yet.';
+            status.textContent = 'Excel row ' + json.row + ' filled in. Review the scores as inherent risk before controls, then click Calculate and save draft. Nothing has been saved yet.';
         } catch (error) {
             status.hidden = true;
             showErrors([error.name === 'AbortError'

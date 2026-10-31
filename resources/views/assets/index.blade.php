@@ -12,9 +12,9 @@ Asset Register | NACSA Toolkit
 @endphp
         <div class="page-heading">
             <div>
-                <p class="eyebrow">Your risk workspace</p>
+                
                 <h1>Asset register</h1>
-                <p>Register and manage assets in your assigned departments.</p>
+                
             </div>
             <a class="button" href="{{ route('assessments.index') }}">Open assessments <svg aria-hidden="true"><use href="#icon-arrow"/></svg></a>
         </div>
@@ -37,7 +37,7 @@ Asset Register | NACSA Toolkit
 
         @if ($writableDepartments->isNotEmpty())
             <h2 id="add-asset-heading">Add an asset</h2>
-            <p class="section-intro">Enter the asset details below. Fields marked optional can be left blank.</p>
+            
 
             <form method="POST" action="{{ route('assets.store') }}">
                 @csrf
@@ -94,7 +94,7 @@ Asset Register | NACSA Toolkit
                     </label>
 
                     <label>
-                        Serial number — optional
+                        Serial number (optional)
                         <input
                             name="serial_number"
                             value="{{ old('serial_number') }}"
@@ -138,7 +138,7 @@ Asset Register | NACSA Toolkit
 
                 <p>
                     <label>
-                        Description — optional
+                        Description (optional)
                         <textarea
                             name="description"
                             maxlength="2000"

@@ -4,7 +4,7 @@
 Review Assessment #{{ $assessment->id }} | NACSA Toolkit
 @endsection
 @section('page-label', 'Assessments')
-@section('page-class', '')
+@section('page-class', ' assessment-workspace')
 
 @section('content')
 
@@ -18,11 +18,7 @@ Review Assessment #{{ $assessment->id }} | NACSA Toolkit
 
     
 
-    <p>
-        Asset: <strong>{{ $assessment->asset_code }}</strong><br>
-        Status: <strong>{{ ucfirst($assessment->status) }}</strong><br>
-        Revision: {{ $assessment->revision }}
-    </p>
+    @include('partials.assessment-context')
 
     @if (session('success'))
         <div class="success" role="status">
@@ -41,12 +37,12 @@ Review Assessment #{{ $assessment->id }} | NACSA Toolkit
     @endif
 
     <section>
-        <h2>Workflow</h2>
+        <h2>Inherent Risk Review</h2>
 
         @if ($assessment->asset_deleted_at)
             <p>
                 This asset is archived. Submission and review are unavailable.
-                Existing review history remains visible.
+                Existing review decisions are retained.
             </p>
         @elseif ($assessment->status === 'draft')
             @if ($canSubmit)
@@ -131,7 +127,7 @@ Review Assessment #{{ $assessment->id }} | NACSA Toolkit
                 </p>
             @endif
         @elseif ($assessment->status === 'verified')
-            <p>This assessment has been verified. See the review history below.</p>
+            <p>This assessment has been verified.</p>
         @elseif ($assessment->status === 'returned')
             <p>
                 This assessment was returned for correction.
@@ -140,24 +136,36 @@ Review Assessment #{{ $assessment->id }} | NACSA Toolkit
         @else
             <p>No workflow action is available for the current status.</p>
         @endif
+        @php
+            $currentDecision = $reviews->firstWhere('revision', $assessment->revision);
+        @endphp
+        @if ($currentDecision && in_array($assessment->status, ['verified', 'returned'], true))
+            <div class="current-review-decision">
+                <p><strong>{{ ucfirst($currentDecision->decision) }}</strong><br>
+                {{ $currentDecision->reviewer_name ?? 'Unavailable' }}<br>{{ $currentDecision->created_at }}</p>
+                <p class="text">{{ $currentDecision->comment }}</p>
+            </div>
+        @endif
     </section>
 
-    <section>
-        <h2>Review history</h2>
-
-        @forelse ($reviews as $review)
-            <article>
-                <h3>{{ ucfirst($review->decision) }}</h3>
-                <p>
-                    Reviewer: {{ $review->reviewer_name ?? 'Unavailable' }}<br>
-                    Revision: {{ $review->revision }}<br>
-                    Stage: {{ ucfirst($review->stage) }}<br>
-                    Recorded at: {{ $review->created_at }}
-                </p>
-                <p class="comment">{{ $review->comment }}</p>
+    <section class="residual-review-list" aria-labelledby="residual-review-heading">
+        <div class="panel-heading"><div><p class="eyebrow">After implementation</p><h2 id="residual-review-heading">Residual Risk Review</h2></div></div>
+        @forelse ($residualPanels as $panel)
+            <article class="treatment-card">
+                <div class="panel-heading">
+                    <div><h3>Treatment Plan {{ $panel['treatment']->id }}</h3><p>{{ $panel['treatment']->responsible_person }}</p></div>
+                    @include('partials.risk-badge', ['riskResult' => $panel['treatment']->residual_result ?? [], 'riskProfile' => $assessment->profile])
+                </div>
+                <div class="assessment-context">
+                    <div><span>Residual Score</span><strong>{{ $panel['treatment']->residual_result['score'] ?? 'Not assessed' }}</strong></div>
+                    <div><span>Implementation Date</span><strong>{{ $panel['treatment']->implemented_at ?? 'Not recorded' }}</strong></div>
+                </div>
+                <h4>Implementation Evidence</h4>
+                <p class="text">{{ $panel['treatment']->implementation_evidence ?? 'Not recorded.' }}</p>
+                @include('partials.residual-decision', $panel)
             </article>
         @empty
-            <p>No review decisions have been recorded yet.</p>
+            <div class="assessment-empty">No treatment plans are available for this revision.</div>
         @endforelse
     </section>
 
