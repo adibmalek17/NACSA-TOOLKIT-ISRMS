@@ -1,114 +1,20 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Treatment Plans | NACSA Toolkit</title>
+@extends('layouts.toolkit')
 
-    <style>
-        * { box-sizing: border-box; }
+@section('title')
+Treatment Plans | NACSA Toolkit
+@endsection
+@section('page-label', 'Assessments')
+@section('page-class', '')
 
-        body {
-            margin: 0;
-            padding: 24px;
-            background: #f4f6f8;
-            color: #183540;
-            font-family: "Segoe UI", sans-serif;
-        }
+@section('content')
 
-        main { max-width: 1100px; margin: auto; }
+<div class="page-heading"><div><h1>Treatment plans — Assessment #{{ $assessment->id }}</h1></div></div>
+@include('partials.assessment-navigation', ['activeTab' => 'treatments'])
 
-        section {
-            margin-top: 24px;
-            padding: 28px;
-            background: white;
-            border-radius: 12px;
-        }
 
-        a { color: #087c72; }
-        p { line-height: 1.6; }
+    
 
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 18px;
-        }
-
-        label { display: block; font-weight: 600; }
-
-        input, select, textarea {
-            display: block;
-            width: 100%;
-            margin-top: 8px;
-            padding: 11px;
-            border: 1px solid #cbd8dd;
-            border-radius: 6px;
-            font: inherit;
-        }
-
-        textarea { min-height: 110px; }
-
-        button {
-            padding: 12px 24px;
-            border: 0;
-            border-radius: 7px;
-            background: #087c72;
-            color: white;
-            font: inherit;
-            cursor: pointer;
-        }
-
-        button:hover { background: #06675f; }
-
-        .success, .errors {
-            padding: 16px;
-            margin-top: 20px;
-            border-radius: 7px;
-        }
-
-        .success { background: #e5f5ee; color: #1e7251; }
-        .errors { background: #fff0ee; color: #a13024; }
-
-        .text {
-            white-space: pre-wrap;
-            overflow-wrap: anywhere;
-        }
-
-        article + article {
-            margin-top: 28px;
-            padding-top: 20px;
-            border-top: 1px solid #e0e7eb;
-        }
-
-        input:focus-visible, select:focus-visible,
-        textarea:focus-visible, button:focus-visible,
-        a:focus-visible {
-            outline: 3px solid #55baa9;
-            outline-offset: 3px;
-        }
-
-        @media (max-width: 650px) {
-            body { padding: 12px; }
-            section { padding: 18px; }
-            .grid { grid-template-columns: 1fr; }
-        }
-    </style>
-</head>
-<body>
-<main>
-    <p>
-        <a href="{{ route('assessments.show', ['assessment' => $assessment->id]) }}">
-            ← Assessment details
-        </a>
-        ·
-        <a href="{{ route('assessments.review', ['assessment' => $assessment->id]) }}">
-            Review workflow
-        </a>
-        ·
-        <a href="{{ route('dashboard') }}">Dashboard</a>
-    </p>
-
-    <h1>Treatment plans — Assessment #{{ $assessment->id }}</h1>
+    
 
     <p>
         Asset: <strong>{{ $assessment->asset_code }}</strong><br>
@@ -260,6 +166,5 @@
             <p>No treatment plans have been added.</p>
         @endforelse
     </section>
-</main>
-</body>
-</html>
+
+@endsection

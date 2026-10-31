@@ -1,102 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Edit Asset | NACSA Toolkit</title>
+@extends('layouts.toolkit')
 
-    <style>
-        * { box-sizing: border-box; }
+@section('title')
+Edit Asset | NACSA Toolkit
+@endsection
+@section('page-label', 'Asset register')
+@section('page-class', '')
 
-        body {
-            margin: 0;
-            padding: 24px;
-            background: #f4f6f8;
-            color: #183540;
-            font-family: "Segoe UI", sans-serif;
-        }
+@section('content')
 
-        main {
-            max-width: 900px;
-            margin: 24px auto;
-        }
-
-        section {
-            padding: 28px;
-            background: white;
-            border-radius: 12px;
-        }
-
-        a { color: #087c72; }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 18px;
-        }
-
-        label {
-            display: block;
-            font-weight: 600;
-        }
-
-        input, select, textarea {
-            display: block;
-            width: 100%;
-            margin-top: 8px;
-            padding: 11px;
-            border: 1px solid #cbd8dd;
-            border-radius: 6px;
-            font: inherit;
-        }
-
-        textarea { min-height: 100px; }
-
-        button {
-            padding: 12px 24px;
-            border: 0;
-            border-radius: 7px;
-            background: #087c72;
-            color: white;
-            font: inherit;
-            cursor: pointer;
-        }
-
-        button:hover { background: #06675f; }
-
-        .errors {
-            padding: 15px;
-            margin-bottom: 20px;
-            background: #fff0ee;
-            color: #a13024;
-            border-radius: 7px;
-        }
-
-        .actions {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            margin-top: 24px;
-        }
-
-        input:focus-visible,
-        select:focus-visible,
-        textarea:focus-visible,
-        button:focus-visible,
-        a:focus-visible {
-            outline: 3px solid #55baa9;
-            outline-offset: 3px;
-        }
-
-        @media (max-width: 650px) {
-            body { padding: 12px; }
-            section { padding: 18px; }
-            .grid { grid-template-columns: 1fr; }
-        }
-    </style>
-</head>
-<body>
-<main>
     <p>
         <a href="{{ route('assets.index') }}">← Asset register</a>
     </p>
@@ -219,6 +130,5 @@
             </div>
         </form>
     </section>
-</main>
-</body>
-</html>
+
+@endsection

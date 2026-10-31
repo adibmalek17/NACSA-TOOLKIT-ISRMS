@@ -1,156 +1,32 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Assessment #{{ $assessment->id }} | NACSA Toolkit</title>
+@extends('layouts.toolkit')
 
-    <style>
-        * { box-sizing: border-box; }
+@section('title')
+Assessment #{{ $assessment->id }} | NACSA Toolkit
+@endsection
+@section('page-label', 'Assessments')
+@section('page-class', '')
 
-        body {
-            margin: 0;
-            padding: 24px;
-            background: #f4f6f8;
-            color: #183540;
-            font-family: "Segoe UI", sans-serif;
-        }
+@section('content')
+@php
+    $user = auth()->user();
+@endphp
+        
+        <div class="page-heading"><div>
+            <p class="eyebrow">Assessment overview</p>
+            <h1>Assessment #{{ $assessment->id }}</h1>
+            <p>{{ $assessment->asset_code }} — {{ $assessment->asset_name }}</p>
+        </div></div>
+@include('partials.assessment-navigation', ['activeTab' => 'overview'])
 
-        main {
-            max-width: 1100px;
-            margin: auto;
-        }
-
-        section {
-            margin-top: 24px;
-            padding: 28px;
-            background: white;
-            border-radius: 12px;
-        }
-
-        a { color: #087c72; }
-
-        a:focus-visible {
-            outline: 3px solid #55baa9;
-            outline-offset: 3px;
-        }
-
-        h1, h2, h3 { overflow-wrap: anywhere; }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 20px;
-        }
-
-        dl { margin: 0; }
-        dt { font-weight: 600; }
-
-        dd {
-            margin: 6px 0 0;
-            line-height: 1.6;
-            overflow-wrap: anywhere;
-        }
-
-        .text {
-            white-space: pre-wrap;
-            overflow-wrap: anywhere;
-            line-height: 1.7;
-        }
-
-        .hint {
-            color: #526974;
-            line-height: 1.6;
-        }
-
-        .notice {
-            padding: 14px;
-            background: #fff4d6;
-            border-radius: 7px;
-            line-height: 1.6;
-        }
-
-        .result {
-            padding: 20px;
-            background: #e5f5ee;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-
-        .result p { margin: 6px 0; }
-
-        .score {
-            font-size: 2rem;
-            font-weight: bold;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-        }
-
-        th, td {
-            padding: 12px;
-            border-bottom: 1px solid #e0e7eb;
-        }
-
-        thead th { background: #f4f6f8; }
-
-        @media (max-width: 650px) {
-            body { padding: 12px; }
-            section { padding: 18px; }
-            .grid { grid-template-columns: 1fr; }
-        }
-    </style>
-</head>
-
-<body>
-<main>
-    <p>
-        <a href="{{ route('assessments.index') }}">← Risk assessments</a>
-        ·
-        <a href="{{ route('dashboard') }}">Dashboard</a>
-    </p>
-
-    <h1>Assessment #{{ $assessment->id }}</h1>
-
-    <p>
-    <a href="{{ route('assessments.history', ['assessment' => $assessment->id]) }}">
-        Open activity history
-    </a>
-</p>
-
-    <p>
-        <a href="{{ route('assessments.report', ['assessment' => $assessment->id]) }}">
-            Open printable report
-        </a>
-    </p>
-
-    <p>
-        <a href="{{ route('assessments.treatments', ['assessment' => $assessment->id]) }}">
-            Open treatment plans
-        </a>
-    </p>
-
-    <p>
-        <a href="{{ route('assessments.review', ['assessment' => $assessment->id]) }}">
-            Open review workflow
-        </a>
-    </p>
-
-    <p>
-        {{ $assessment->asset_code }} — {{ $assessment->asset_name }}
-    </p>
 
     @if ($assessment->asset_deleted_at)
-        <p class="notice">
+        <p class="overview-notice">
             This asset is archived. Its saved assessment remains available
             for reference.
         </p>
     @endif
 
-    <section>
+    <section class="overview-panel">
         <h2>Assessment details</h2>
 
         <dl class="grid">
@@ -196,7 +72,7 @@
         </dl>
     </section>
 
-    <section>
+    <section class="overview-panel">
         <h2>Risk description</h2>
 
         <h3>Threat</h3>
@@ -209,7 +85,8 @@
         <p class="text">{{ $assessment->existing_controls ?: 'No controls recorded.' }}</p>
     </section>
 
-    <section>
+    <div class="overview-columns">
+    <section class="overview-panel">
         <h2>Saved scoring inputs</h2>
 
         <table>
@@ -242,7 +119,7 @@
         </table>
     </section>
 
-    <section>
+    <section class="overview-panel">
         <h2>Saved result</h2>
 
         <div class="result">
@@ -293,6 +170,7 @@
             Opening this page does not recalculate them.
         </p>
     </section>
-</main>
-</body>
-</html>
+</div>
+        
+    
+@endsection

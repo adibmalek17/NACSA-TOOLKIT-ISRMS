@@ -1,131 +1,24 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Assessment {{ $assessment->id }} Report | NACSA Toolkit</title>
+@extends('layouts.toolkit')
 
-    <style>
-        * { box-sizing: border-box; }
+@section('title')
+Assessment {{ $assessment->id }} Report | NACSA Toolkit
+@endsection
+@section('page-label', 'Assessments')
+@section('page-class', 'report-page')
 
-        body {
-            margin: 0;
-            padding: 24px;
-            background: #f4f6f8;
-            color: #183540;
-            font-family: "Segoe UI", sans-serif;
-            line-height: 1.6;
-        }
+@section('content')
 
-        main {
-            max-width: 1050px;
-            margin: auto;
-            padding: 32px;
-            background: white;
-        }
+<div class="page-heading"><div><h1>NACSA Toolkit — Assessment Report</h1></div></div>
+@include('partials.assessment-navigation', ['activeTab' => 'report'])
 
-        a { color: #087c72; }
 
-        button {
-            padding: 10px 20px;
-            border: 0;
-            border-radius: 6px;
-            background: #087c72;
-            color: white;
-            font: inherit;
-            cursor: pointer;
-        }
-
-        .toolbar {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 20px;
-            margin-bottom: 28px;
-        }
-
-        section {
-            margin-top: 28px;
-            padding-top: 16px;
-            border-top: 1px solid #cbd8dd;
-        }
-
-        .text {
-            white-space: pre-wrap;
-            overflow-wrap: anywhere;
-        }
-
-        .table-wrap { overflow-x: auto; }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-        }
-
-        th, td {
-            padding: 10px;
-            border: 1px solid #cbd8dd;
-            vertical-align: top;
-            overflow-wrap: anywhere;
-        }
-
-        th { background: #f4f6f8; }
-
-        article + article {
-            margin-top: 24px;
-            padding-top: 16px;
-            border-top: 1px solid #cbd8dd;
-        }
-
-        a:focus-visible, button:focus-visible {
-            outline: 3px solid #55baa9;
-            outline-offset: 3px;
-        }
-
-        @media (max-width: 650px) {
-            body { padding: 12px; }
-            main { padding: 18px; }
-        }
-
-        @page {
-            size: A4;
-            margin: 16mm;
-        }
-
-        @media print {
-            body {
-                padding: 0;
-                background: white;
-                color: black;
-                font-size: 10pt;
-            }
-
-            main {
-                max-width: none;
-                padding: 0;
-            }
-
-            .toolbar { display: none; }
-            .table-wrap { overflow: visible; }
-
-            h1, h2, h3, h4 { break-after: avoid; }
-            tr { break-inside: avoid; }
-            thead { display: table-header-group; }
-        }
-    </style>
-</head>
-<body>
-<main>
     <div class="toolbar">
-        <a href="{{ route('assessments.show', ['assessment' => $assessment->id]) }}">
-            ← Assessment details
-        </a>
+        
 
-        <button type="button" id="print-report">Print / Save as PDF</button>
+        <button type="button" id="export-excel" data-assessment-id="{{ $assessment->id }}">Export Excel</button>
     </div>
 
-    <h1>NACSA Toolkit — Assessment Report</h1>
+    
 
     <p>
     Generated: {{ now()->timezone('Asia/Kuala_Lumpur')->format('d/m/Y h:i:s A') }}
@@ -338,12 +231,9 @@
             <p>No treatment plans recorded.</p>
         @endforelse
     </section>
-</main>
 
-<script>
-    document.getElementById('print-report').addEventListener('click', () => {
-        window.print();
-    });
-</script>
-</body>
-</html>
+@endsection
+
+@section('scripts')
+@include('partials.report-excel-script')
+@endsection

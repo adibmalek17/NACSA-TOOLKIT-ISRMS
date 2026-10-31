@@ -1,114 +1,25 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Residual Risk Review | NACSA Toolkit</title>
+@extends('layouts.toolkit')
 
-    <style>
-        * { box-sizing: border-box; }
+@section('title')
+Residual Risk Review | NACSA Toolkit
+@endsection
+@section('page-label', 'Assessments')
+@section('page-class', '')
 
-        body {
-            margin: 0;
-            padding: 24px;
-            background: #f4f6f8;
-            color: #183540;
-            font-family: "Segoe UI", sans-serif;
-        }
+@section('content')
 
-        main { max-width: 1100px; margin: auto; }
+<div class="page-heading"><div><h1>Residual risk review — Plan #{{ $treatment->id }}</h1></div></div>
+@include('partials.assessment-navigation', ['activeTab' => 'treatments'])
 
-        section {
-            margin-top: 24px;
-            padding: 28px;
-            background: white;
-            border-radius: 12px;
-        }
 
-        a { color: #087c72; }
-        p { line-height: 1.6; }
-
-        label { display: block; font-weight: 600; }
-
-        textarea {
-            display: block;
-            width: 100%;
-            min-height: 130px;
-            margin-top: 8px;
-            padding: 11px;
-            border: 1px solid #cbd8dd;
-            border-radius: 6px;
-            font: inherit;
-        }
-
-        button {
-            margin-top: 20px;
-            padding: 12px 24px;
-            border: 0;
-            border-radius: 7px;
-            background: #087c72;
-            color: white;
-            font: inherit;
-            cursor: pointer;
-        }
-
-        .success, .errors {
-            margin-top: 20px;
-            padding: 16px;
-            border-radius: 7px;
-        }
-
-        .success { background: #e5f5ee; color: #1e7251; }
-        .errors { background: #fff0ee; color: #a13024; }
-
-        .text {
-            white-space: pre-wrap;
-            overflow-wrap: anywhere;
-        }
-
-        .table-wrap { overflow-x: auto; }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-        }
-
-        th, td {
-            padding: 12px;
-            border-bottom: 1px solid #e0e7eb;
-        }
-
-        th { background: #f4f6f8; }
-
-        a:focus-visible, button:focus-visible, textarea:focus-visible {
-            outline: 3px solid #55baa9;
-            outline-offset: 3px;
-        }
-
-        @media (max-width: 650px) {
-            body { padding: 12px; }
-            section { padding: 18px; }
-        }
-    </style>
-</head>
-<body>
-<main>
     @if (!$isCurrentTreatment)
         <section><p>This plan belongs to assessment revision {{ $treatment->assessment_revision ?? 'unknown' }}.
             It is historical and view only. Its results do not approve the current revision.</p></section>
     @endif
 
-    <p>
-        <a href="{{ route('assessments.implementation', [
-            'assessment' => $assessment->id,
-            'treatment' => $treatment->id,
-        ]) }}">← Implementation details</a>
-        ·
-        <a href="{{ route('dashboard') }}">Dashboard</a>
-    </p>
+    
 
-    <h1>Residual risk review — Plan #{{ $treatment->id }}</h1>
+    
 
     <p>
         Assessment: #{{ $assessment->id }}<br>
@@ -251,6 +162,5 @@
             </form>
         @endif
     </section>
-</main>
-</body>
-</html>
+
+@endsection

@@ -1,103 +1,21 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Correct Assessment | NACSA Toolkit</title>
+@extends('layouts.toolkit')
 
-    <style>
-        * { box-sizing: border-box; }
+@section('title')
+Correct Assessment | NACSA Toolkit
+@endsection
+@section('page-label', 'Assessments')
+@section('page-class', '')
 
-        body {
-            margin: 0;
-            padding: 24px;
-            background: #f4f6f8;
-            color: #183540;
-            font-family: "Segoe UI", sans-serif;
-        }
+@section('content')
 
-        main { max-width: 1000px; margin: auto; }
+<div class="page-heading"><div><h1>Correct assessment #{{ $assessment->id }}</h1></div></div>
+@include('partials.assessment-navigation', ['activeTab' => 'overview'])
 
-        section {
-            margin-top: 24px;
-            padding: 28px;
-            background: white;
-            border-radius: 12px;
-        }
 
-        a { color: #087c72; }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 18px;
-        }
-
-        label { display: block; font-weight: 600; }
-
-        input, textarea {
-            display: block;
-            width: 100%;
-            margin-top: 8px;
-            padding: 11px;
-            border: 1px solid #cbd8dd;
-            border-radius: 6px;
-            font: inherit;
-        }
-
-        textarea { min-height: 110px; }
-
-        button {
-            padding: 12px 24px;
-            border: 0;
-            border-radius: 7px;
-            background: #087c72;
-            color: white;
-            font: inherit;
-            cursor: pointer;
-        }
-
-        .notice, .errors {
-            padding: 18px;
-            margin-bottom: 20px;
-            border-radius: 7px;
-        }
-
-        .notice { background: #fff5da; }
-        .errors { background: #fff0ee; color: #a13024; }
-        .comment { white-space: pre-wrap; overflow-wrap: anywhere; }
-
-        .actions {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 20px;
-            margin-top: 24px;
-        }
-
-        input:focus-visible, textarea:focus-visible,
-        button:focus-visible, a:focus-visible {
-            outline: 3px solid #55baa9;
-            outline-offset: 3px;
-        }
-
-        @media (max-width: 650px) {
-            body { padding: 12px; }
-            section { padding: 18px; }
-            .grid { grid-template-columns: 1fr; }
-        }
-    </style>
-</head>
-<body>
-<main>
-    <p>
-        <a href="{{ route('assessments.review', ['assessment' => $assessment->id]) }}">
-            ← Review workflow
-        </a>
-    </p>
+    
 
     <section>
-        <h1>Correct assessment #{{ $assessment->id }}</h1>
+        
 
         <p>
             Asset: <strong>{{ $assessment->asset_code }}</strong><br>
@@ -227,6 +145,5 @@
             </div>
         </form>
     </section>
-</main>
-</body>
-</html>
+
+@endsection

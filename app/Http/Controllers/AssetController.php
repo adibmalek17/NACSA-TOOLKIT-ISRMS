@@ -207,36 +207,62 @@ class AssetController extends Controller
 
     public function destroy(Request $request, RiskAsset $asset)
     {
-        $canArchive = DB::table('department_memberships')
-            ->where('user_id', $request->user()->id)
-            ->where('department_id', $asset->department_id)
-            ->where('role', 'admin')
-            ->exists();
+        $deleted = DB::transaction(function () use ($request, $asset) {
+            $currentAsset = RiskAsset::query()
+                ->whereKey($asset->id)
+                ->lockForUpdate()
+                ->firstOrFail();
 
-        abort_unless(
-            $canArchive,
-            403,
-            'You cannot archive assets in this department.'
-        );
+            $canDelete = DB::table('department_memberships')
+                ->where('user_id', $request->user()->id)
+                ->where('department_id', $currentAsset->department_id)
+                ->where('role', 'admin')
+                ->exists();
 
-        DB::transaction(function () use ($asset, $request) {
-            $asset->delete();
+            abort_unless(
+                $canDelete,
+                403,
+                'You cannot delete assets in this department.'
+            );
 
+            $hasAssessments = DB::table('risk_assessments')
+                ->where('risk_asset_id', $currentAsset->id)
+                ->exists();
+
+            if ($hasAssessments) {
+                return false;
+            }
+
+            // Preserve an audit record before permanently deleting the asset.
             DB::table('risk_audit_events')->insert([
                 'actor_id' => $request->user()->id,
                 'risk_assessment_id' => null,
-                'action' => 'asset.archived',
+                'action' => 'asset.deleted',
                 'metadata' => json_encode([
-                    'asset_id' => $asset->id,
-                    'department_id' => $asset->department_id,
-                    'code' => $asset->code,
+                    'asset_id' => $currentAsset->id,
+                    'department_id' => $currentAsset->department_id,
+                    'code' => $currentAsset->code,
+                    'name' => $currentAsset->name,
+                    'deletion_type' => 'permanent',
                 ], JSON_THROW_ON_ERROR),
                 'created_at' => now(),
             ]);
+
+            $currentAsset->forceDelete();
+
+            return true;
         });
+
+        if (! $deleted) {
+            return redirect()
+                ->route('assets.index')
+                ->withErrors([
+                    'asset' => 'This asset has saved assessments. Delete those assessments before deleting the asset.',
+                ]);
+        }
 
         return redirect()
             ->route('assets.index')
-            ->with('success', 'Asset archived successfully.');
+            ->with('success', 'Asset permanently deleted.');
     }
 }

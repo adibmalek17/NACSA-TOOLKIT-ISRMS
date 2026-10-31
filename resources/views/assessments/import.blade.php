@@ -1,34 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Import Assessments | NACSA Toolkit</title>
-    <style>
-        * { box-sizing: border-box; }
-        body { margin: 0; padding: 24px; background: #f4f6f8; color: #183540; font-family: "Segoe UI", sans-serif; }
-        main { max-width: 1200px; margin: auto; }
-        section, article { margin: 24px 0; padding: 24px; background: white; border-radius: 12px; }
-        a { color: #087c72; }
-        p, li { line-height: 1.6; }
-        label { display: block; margin: 20px 0; font-weight: 600; }
-        input:not([type=checkbox]), select { display: block; width: 100%; max-width: 650px; padding: 12px; margin-top: 8px; font: inherit; border: 1px solid #cbd8dd; border-radius: 6px; }
-        button { background: #087c72; color: white; border: 0; padding: 12px 24px; border-radius: 7px; font: inherit; cursor: pointer; }
-        :focus-visible { outline: 3px solid #55baa9; outline-offset: 3px; }
-        .errors { background: #fff0ee; color: #a13024; padding: 16px; border-radius: 7px; }
-        .ready { color: #1e7251; }
-        .table-wrap { overflow-x: auto; }
-        table { border-collapse: collapse; width: 100%; text-align: left; }
-        td, th { border-bottom: 1px solid #e0e7eb; padding: 12px; vertical-align: top; }
-        th { background: #f4f6f8; }
-        dd { margin: 6px 0 16px; white-space: pre-wrap; overflow-wrap: anywhere; }
-        dt { font-weight: bold; }
-        summary { cursor: pointer; padding: 8px 0; }
-        @media(max-width:650px) { body { padding: 12px; } section, article { padding: 16px; } }
-    </style>
-</head>
-<body>
-<main>
+@extends('layouts.toolkit')
+
+@section('title')
+Import Assessments | NACSA Toolkit
+@endsection
+@section('page-label', 'Assessments')
+@section('page-class', '')
+
+@section('content')
+
     <p><a href="{{ route('assessments.index') }}">← Risk assessments</a></p>
     <h1>Import assessments from Excel</h1>
     @if ($errors->any())
@@ -111,6 +90,5 @@
             </section>
         @endif
     @endif
-</main>
-</body>
-</html>
+
+@endsection
