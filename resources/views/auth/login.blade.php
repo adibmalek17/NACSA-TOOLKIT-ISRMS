@@ -17,31 +17,34 @@
             place-items: center;
             padding: 24px;
             font-family: "Segoe UI", sans-serif;
-            background: #102e38;
-            color: #183540;
+            background: #14263d;
+            color: #1e293b;
         }
 
         main {
             width: 100%;
             max-width: 440px;
-            padding: 36px;
+            padding: clamp(20px, 5vw, 36px);
             background: white;
-            border-radius: 16px;
+            border: 1px solid #dce3ec;
+            border-radius: 12px;
         }
 
         .brand {
-            color: #087c72;
+            color: #2457c5;
             font-size: 12px;
             font-weight: 700;
             letter-spacing: 2px;
         }
+
+        .brand small { display: block; margin-top: 3px; color: #526176; font-size: 10px; }
 
         h1 {
             margin-bottom: 8px;
         }
 
         p {
-            color: #647780;
+            color: #526176;
             line-height: 1.6;
         }
 
@@ -56,7 +59,7 @@
             width: 100%;
             margin-top: 8px;
             padding: 12px;
-            border: 1px solid #cbd8dd;
+            border: 1px solid #bcc9d8;
             border-radius: 7px;
             font: inherit;
         }
@@ -67,7 +70,7 @@
             padding: 13px;
             border: none;
             border-radius: 7px;
-            background: #087c72;
+            background: #2457c5;
             color: white;
             font: inherit;
             font-weight: 600;
@@ -75,12 +78,12 @@
         }
 
         button:hover {
-            background: #06675f;
+            background: #1d46a0;
         }
 
         input:focus-visible,
         button:focus-visible {
-            outline: 3px solid #55baa9;
+            outline: 3px solid #6996ef;
             outline-offset: 3px;
         }
 
@@ -101,10 +104,11 @@
             font-size: 12px;
         }
     </style>
+    @include('partials.page-transitions')
 </head>
 <body>
-    <main>
-        <div class="brand">NACSA TOOLKIT</div>
+    <main id="main-content">
+        <div class="brand">NACSA TOOLKIT <small>ISRMS</small></div>
 
         <h1>Welcome back</h1>
         <p>Sign in to your information security risk workspace.</p>
