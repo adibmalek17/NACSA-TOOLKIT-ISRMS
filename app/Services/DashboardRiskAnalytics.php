@@ -12,9 +12,10 @@ final class DashboardRiskAnalytics
     public static function forDepartments(array $departmentIds): array
     {
         $inherent = ['high' => 0, 'medium' => 0, 'low' => 0, 'neutral' => 0];
+        $expected = $inherent;
         $residual = $inherent;
         if ($departmentIds === []) {
-            return compact('inherent', 'residual');
+            return compact('inherent', 'expected', 'residual');
         }
 
         $assessments = DB::table('risk_assessments as assessment')
@@ -22,8 +23,12 @@ final class DashboardRiskAnalytics
             ->whereIn('asset.department_id', $departmentIds)
             ->whereNull('asset.deleted_at');
 
-        foreach ((clone $assessments)->select('assessment.result', 'assessment.profile')->cursor() as $row) {
+        foreach ((clone $assessments)->select('assessment.result', 'assessment.expected_result', 'assessment.profile')->cursor() as $row) {
             $inherent[self::band($row->result, $row->profile)]++;
+            $expectedResult = json_decode($row->expected_result ?? '', true);
+            if (is_array($expectedResult) && isset($expectedResult['score'])) {
+                $expected[self::band($row->expected_result, $row->profile)]++;
+            }
         }
 
         $plans = (clone $assessments)
@@ -39,7 +44,7 @@ final class DashboardRiskAnalytics
             $residual[self::band($row->residual_result, $row->profile)]++;
         }
 
-        return compact('inherent', 'residual');
+        return compact('inherent', 'expected', 'residual');
     }
 
     private static function band(?string $json, string $profile): string

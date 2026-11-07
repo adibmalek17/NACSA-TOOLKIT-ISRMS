@@ -154,6 +154,7 @@ final class RiskAssessmentCorrectionController extends Controller
             }
 
             $result = $calculator->calculate($inputs);
+            $expected = \App\Services\ExpectedRisk::calculate($request->all(), $profile, $calculator);
             $revision = (int) $record->revision + 1;
             $now = now();
 
@@ -171,6 +172,8 @@ final class RiskAssessmentCorrectionController extends Controller
                 'status' => $record->status,
                 'revision' => $record->revision,
                 'risk_basis' => $record->risk_basis,
+                'expected_inputs' => \App\Services\ExpectedRisk::decode($record->expected_inputs),
+                'expected_result' => \App\Services\ExpectedRisk::decode($record->expected_result),
                 'inputs' => json_decode(
                     $record->inputs,
                     true,
@@ -198,6 +201,7 @@ final class RiskAssessmentCorrectionController extends Controller
                     'engine_version' => $result['version'],
                     'inputs' => json_encode($inputs, JSON_THROW_ON_ERROR),
                     'result' => json_encode($result, JSON_THROW_ON_ERROR),
+                    ...\App\Services\ExpectedRisk::columns($expected),
                     'risk_basis' => 'inherent',
                     'status' => 'draft',
                     'revision' => $revision,

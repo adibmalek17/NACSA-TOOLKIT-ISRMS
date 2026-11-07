@@ -1,0 +1,23 @@
+EXPECTED RISK EXCEL INPUT
+
+File: .xlsx, up to 2 MB. Worksheet name: Assessments.
+Put column names in row 1 and one matching assessment row in row 2.
+Use numbers, not formulas. Columns may be reordered.
+
+NACSA profiles:
+expected_c, expected_i, expected_a, expected_likelihood, expected_loss
+
+USIM profile:
+expected_c, expected_i, expected_a, expected_likelihood, expected_operations, expected_financial, expected_reputation
+
+nacsa-3-2024 and usim-2026: whole numbers 1 to 3.
+nacsa-5-2024: whole numbers 1 to 5.
+
+Optional matching columns: asset_code, profile.
+If present and nonblank they must match the selected asset/profile.
+Keep one matching row; multiple matching rows are rejected.
+
+Expected-only upload: use the columns above in the Expected Risk Scoring upload.
+Combined upload: add the expected_ columns to your existing assessment workbook and use the top Upload Excel control.
+Do not populate loss fields for USIM, or operations/financial/reputation fields for NACSA.
+Old assessment workbooks without expected columns still work and leave expected risk unassessed.

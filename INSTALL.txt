@@ -1,0 +1,3 @@
+Copy the resources folder into C:\laragon\www\nacsa-toolkit and replace matching files.
+Run php artisan view:clear, then refresh with Ctrl+F5.
+This updates the guest security page theme. MFA verification and recovery code handlers are unchanged. No migration is required.

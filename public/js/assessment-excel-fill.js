@@ -104,11 +104,16 @@
                 const input = form.elements.namedItem(key);
                 if (input) input.value = json.fields[key] ?? '';
             }
+            for (const key of ['c','i','a','likelihood','loss','operations','financial','reputation']) {
+                const input = form.elements.namedItem('expected['+key+']');
+                if (input) input.value = json.fields['expected_'+key] ?? '';
+            }
+            form.dispatchEvent(new Event('expected-filled'));
             // Clear inactive profile inputs so an old profile's values cannot be reused accidentally.
             for (const key of (selectedProfile === 'usim-2026' ? ['loss'] : ['operations', 'financial', 'reputation'])) {
                 form.elements.namedItem(key).value = '';
             }
-            status.textContent = 'Excel row ' + json.row + ' filled in. Review the scores as inherent risk before controls, then click Calculate and save draft. Nothing has been saved yet.';
+            status.textContent = 'Excel row ' + json.row + ' filled in. Review the inherent and expected scores, then click Save Assessment. Nothing has been saved yet.';
         } catch (error) {
             status.hidden = true;
             showErrors([error.name === 'AbortError'
@@ -118,6 +123,7 @@
             clearTimeout(timer);
             controls.forEach(([el, disabled]) => { el.disabled = disabled; });
             busy = false;
+            form.dispatchEvent(new Event('expected-filled'));
         }
     }
 

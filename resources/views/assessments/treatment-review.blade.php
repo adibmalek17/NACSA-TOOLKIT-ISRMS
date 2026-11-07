@@ -50,6 +50,7 @@ Residual Risk Review | NACSA Toolkit
                         <tr>
                             <th>Result</th>
                             <th>Inherent Risk</th>
+                            <th>Expected Risk</th>
                             <th>Residual risk</th>
                         </tr>
                     </thead>
@@ -57,11 +58,13 @@ Residual Risk Review | NACSA Toolkit
                         <tr>
                             <th>Score</th>
                             <td>{{ $baseline['result']['score'] ?? 'Unavailable' }}</td>
+                            <td>{{ $baseline['expected_result']['score'] ?? 'Not assessed' }}</td>
                             <td>{{ $treatment->residual_result['score'] }}</td>
                         </tr>
                         <tr>
                             <th>Risk label</th>
                             <td>@include('partials.risk-badge', ['riskResult' => $baseline['result'] ?? [], 'riskProfile' => $assessment->profile])</td>
+                            <td>@include('partials.risk-badge', ['riskResult' => $baseline['expected_result'] ?? [], 'riskProfile' => $assessment->profile])</td>
                             <td>@include('partials.risk-badge', ['riskResult' => $treatment->residual_result ?? [], 'riskProfile' => $assessment->profile])</td>
                         </tr>
                     </tbody>

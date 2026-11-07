@@ -1,5 +1,5 @@
 <section aria-labelledby="risk-comparison-heading">
-    <h2 id="risk-comparison-heading">Inherent and Residual Risk</h2>
+    <h2 id="risk-comparison-heading">Inherent, Expected and Residual Risk</h2>
     <div class="table-wrap" tabindex="0" role="region" aria-label="Risk comparison">
         <table>
             <thead>
@@ -11,6 +11,13 @@
                     <td class="risk-score">{{ $assessment->result['score'] ?? 'Not assessed' }}</td>
                     <td>@include('partials.risk-badge', ['riskResult' => $assessment->result, 'riskProfile' => $assessment->profile])</td>
                     <td>{{ ucfirst($assessment->status) }}</td>
+                </tr>
+                @php($expectedResult = \App\Services\ExpectedRisk::decode($assessment->expected_result ?? null))
+                <tr>
+                    <th scope="row">Expected Risk</th>
+                    <td class="risk-score">{{ $expectedResult['score'] ?? 'Not assessed' }}</td>
+                    <td>@include('partials.risk-badge', ['riskResult' => $expectedResult, 'riskProfile' => $assessment->profile])</td>
+                    <td>{{ $expectedResult ? ucfirst($assessment->status) : 'Not assessed' }}</td>
                 </tr>
                 @forelse ($riskComparison as $comparison)
                     <tr>

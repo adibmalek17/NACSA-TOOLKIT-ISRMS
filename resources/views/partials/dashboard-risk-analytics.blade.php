@@ -2,6 +2,7 @@
     $riskAnalytics = \App\Services\DashboardRiskAnalytics::forDepartments($memberships->pluck('id')->unique()->values()->all());
     $riskCharts = [
         ['key' => 'inherent', 'title' => 'Inherent Risk Levels', 'unit' => 'assessments', 'scope' => 'Active assets'],
+        ['key' => 'expected', 'title' => 'Expected Risk Levels', 'unit' => 'assessments', 'scope' => 'Active assets'],
         ['key' => 'residual', 'title' => 'Residual Risk Levels', 'unit' => 'implemented plans', 'scope' => 'Current revision'],
     ];
     $riskBands = [
@@ -35,7 +36,7 @@
                 @endforeach
             </div>
             @if ($riskTotal === 0)
-                <p class="analytics-empty">{{ $riskChart['key'] === 'inherent' ? 'No assessments for active assets.' : 'No residual results recorded.' }}</p>
+                <p class="analytics-empty">{{ $riskChart['key'] === 'inherent' ? 'No assessments for active assets.' : ($riskChart['key'] === 'expected' ? 'No expected results recorded.' : 'No residual results recorded.') }}</p>
             @endif
         </section>
     @endforeach

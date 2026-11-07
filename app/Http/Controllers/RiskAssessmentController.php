@@ -170,7 +170,7 @@ final class RiskAssessmentController extends Controller
                 fputcsv($output, [
                     'Assessment ID', 'Asset code', 'Asset name', 'Department',
                     'Assessment date', 'Profile', 'Initial risk score', 'Initial risk level',
-                    'Status', 'Revision', 'Risk owner', 'Scoring basis', 'Inherent score', 'Inherent level', 'Residual risk by current-revision plan',
+                    'Status', 'Revision', 'Risk owner', 'Scoring basis', 'Inherent score', 'Inherent level', 'Expected score', 'Expected level', 'Residual risk by current-revision plan',
                 ], ',', '"', '');
 
                 // Export all matching rows, not only the current table page.
@@ -196,6 +196,8 @@ final class RiskAssessmentController extends Controller
                         RiskComparison::basisLabel($assessment),
                         $assessment->risk_basis === 'inherent' ? ($result['score'] ?? '') : '',
                         $assessment->risk_basis === 'inherent' ? ($result['label'] ?? '') : '',
+                        \App\Services\ExpectedRisk::decode($assessment->expected_result ?? null)['score'] ?? '',
+                        \App\Services\ExpectedRisk::decode($assessment->expected_result ?? null)['label'] ?? '',
                         $residual ?: 'Not assessed',
                     ];
                     fputcsv(
@@ -338,6 +340,7 @@ final class RiskAssessmentController extends Controller
 
         // Always calculate the result on the server.
         $result = $calculator->calculate($inputs);
+        $expected = \App\Services\ExpectedRisk::calculate($request->all(), $profile, $calculator);
 
         DB::transaction(function () use (
             $request,
@@ -345,6 +348,7 @@ final class RiskAssessmentController extends Controller
             $profile,
             $validated,
             $inputs,
+            $expected,
             $result
         ) {
             $currentAsset = RiskAsset::query()
@@ -378,6 +382,7 @@ final class RiskAssessmentController extends Controller
                 'risk_owner' => $validated['risk_owner'],
                 'inputs' => json_encode($inputs, JSON_THROW_ON_ERROR),
                 'result' => json_encode($result, JSON_THROW_ON_ERROR),
+                ...\App\Services\ExpectedRisk::columns($expected),
                 'risk_basis' => 'inherent',
                 'status' => 'draft',
                 'revision' => 1,

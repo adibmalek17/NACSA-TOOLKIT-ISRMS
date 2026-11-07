@@ -52,5 +52,5 @@
         </form>
     </details>
 
-    <p><a href="{{ route('login') }}">Back to sign in</a></p>
+    <p class="back-link"><a href="{{ route('login') }}">Back to sign in</a></p>
 @endsection

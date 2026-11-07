@@ -131,6 +131,8 @@ Correct Assessment | NACSA Toolkit
                 @endforeach
             </div>
 
+            @include('partials.expected-risk-fields')
+
             <p>
                 Saving recalculates the result and creates draft revision
                 {{ $assessment->revision + 1 }}.

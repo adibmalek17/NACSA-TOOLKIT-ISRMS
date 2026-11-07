@@ -43,6 +43,7 @@ final class InherentResidualRiskTest extends TestCase
         (require database_path('migrations/2026_10_19_093639_add_risk_treatment_id_to_risk_reviews_table.php'))->up();
         (require database_path('migrations/2026_10_29_000001_add_assessment_revision_to_risk_treatments.php'))->up();
         (require database_path('migrations/2026_10_31_000001_add_risk_basis_to_assessments.php'))->up();
+        (require database_path('migrations/2026_11_07_000001_add_expected_risk_to_assessments.php'))->up();
         DB::table('departments')->insert([
             ['id' => 1, 'code' => 'DEV', 'name' => 'Development'],
             ['id' => 2, 'code' => 'OTHER', 'name' => 'Other'],
@@ -201,7 +202,7 @@ final class InherentResidualRiskTest extends TestCase
         $this->get(route('assessments.review', $id))->assertOk()->assertSee('Evidence checked');
         $this->get(route('assessments.treatments', $id))->assertOk()->assertSee('View Review Decision');
         $this->get(route('assessments.report', $id))->assertOk()
-            ->assertSee('Inherent and Residual Risk')->assertSee('Treatment Plan '.$plan);
+            ->assertSee('Inherent, Expected and Residual Risk')->assertSee('Treatment Plan '.$plan);
     }
 
     public function test_comparison_keeps_each_current_plan_and_never_uses_historical_or_unknown_revisions(): void
@@ -246,5 +247,39 @@ final class InherentResidualRiskTest extends TestCase
         $this->assertStringContainsString('Not assessed', $csv);
         $this->assertStringContainsString('TEST-1', $csv);
         $this->assertStringNotContainsString('TEST-2', $csv);
+    }
+
+    public function test_expected_scores_are_calculated_saved_and_retained_in_revision_history(): void
+    {
+        $scores = ['c'=>2, 'i'=>2, 'a'=>2, 'likelihood'=>1, 'operations'=>2, 'financial'=>2, 'reputation'=>2];
+        $payload = $this->payload('draft') + ['risk_asset_id'=>1, 'profile'=>'usim-2026', 'expected'=>$scores];
+        $this->post(route('assessments.store'), $payload + ['expected_result'=>['score'=>999]])
+            ->assertSessionHasNoErrors()->assertRedirect();
+        $row = DB::table('risk_assessments')->orderByDesc('id')->first();
+        $expected = app(RiskCalculator::class)->calculate(['profile'=>'usim-2026'] + $scores);
+        $this->assertSame($expected, json_decode($row->expected_result, true));
+        $this->get(route('assessments.report', $row->id))->assertOk()->assertSee('Expected Risk');
+        $this->put(route('assessments.update', $row->id), $this->payload('draft') + ['expected'=>array_replace($scores, ['c'=>1])])
+            ->assertSessionHasNoErrors()->assertRedirect();
+        $event = DB::table('risk_audit_events')->where('risk_assessment_id',$row->id)->where('action','assessment.edited')->first();
+        $snapshot = json_decode($event->metadata,true)['previous_snapshot'];
+        $this->assertSame($expected, $snapshot['expected_result']);
+        $current = DB::table('risk_assessments')->find($row->id);
+        $this->assertSame(2, (int) $current->revision);
+        $baseline = TreatmentRevision::baseline($current, (object)['assessment_revision'=>1]);
+        $this->assertSame($expected, $baseline['expected_result']);
+    }
+
+    public function test_invalid_expected_scores_and_unauthorized_writes_are_rejected(): void
+    {
+        $payload = $this->payload('draft') + ['risk_asset_id'=>1, 'profile'=>'usim-2026'];
+        $this->post(route('assessments.store'), $payload + ['expected'=>['c'=>4]])
+            ->assertSessionHasErrors(['expected.c','expected.i']);
+        $this->assertDatabaseCount('risk_assessments',0);
+        $this->actingAs($this->reviewer)->post(route('assessments.store'), $payload)->assertForbidden();
+        $this->actingAs($this->other)->post(route('assessments.store'), $payload)->assertForbidden();
+        $this->actingAs($this->assessor)->post(route('assessments.store'), $payload)
+            ->assertSessionHasNoErrors()->assertRedirect();
+        $this->assertNull(DB::table('risk_assessments')->first()->expected_result);
     }
 }

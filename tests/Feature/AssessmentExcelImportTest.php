@@ -52,6 +52,7 @@ final class AssessmentExcelImportTest extends TestCase
             $t->date('assessed_on'); $t->string('profile'); $t->string('engine_version');
             $t->text('threat'); $t->text('vulnerability'); $t->text('existing_controls')->nullable();
             $t->string('risk_owner'); $t->text('inputs'); $t->text('result'); $t->string('status');
+            $t->json('expected_inputs')->nullable(); $t->json('expected_result')->nullable();
             $t->integer('revision'); $t->string('risk_basis')->nullable(); $t->timestamps();
         });
         Schema::create('risk_audit_events', function (Blueprint $t) {
@@ -215,6 +216,44 @@ final class AssessmentExcelImportTest extends TestCase
         $this->post('/assessments/import/preview')->assertNotFound();
         $this->post('/assessments/import/12345678-1234-4123-8123-123456789abc')->assertNotFound();
         $this->assertDatabaseCount('risk_assessments', 0);
+    }
+
+    private function expectedWorkbook(array $values): UploadedFile
+    {
+        $book = new Spreadsheet();
+        $sheet = $book->getActiveSheet(); $sheet->setTitle('Assessments');
+        $sheet->fromArray(array_keys($values), null, 'A1');
+        $sheet->fromArray(array_values($values), null, 'A2');
+        $path = tempnam(sys_get_temp_dir(),'expected-test-');
+        try {
+            (new Xlsx($book))->save($path);
+            return UploadedFile::fake()->createWithContent('expected.xlsx',file_get_contents($path));
+        } finally { unlink($path); $book->disconnectWorksheets(); }
+    }
+
+    public function test_expected_only_import_supports_all_profiles_without_saving(): void
+    {
+        foreach (['nacsa-3-2024','nacsa-5-2024','usim-2026'] as $profile) {
+            $values = [];
+            foreach (\App\Services\ExpectedRisk::keys($profile) as $key) { $values['expected_'.$key] = 2; }
+            $this->postJson(route('assessments.import.fill'), [
+                'risk_asset_id'=>1, 'profile'=>$profile, 'stage'=>'expected',
+                'workbook'=>$this->expectedWorkbook($values),
+            ])->assertOk()->assertJsonPath('fields.expected_c',2);
+        }
+        $this->assertDatabaseCount('risk_assessments',0);
+    }
+
+    public function test_expected_import_rejects_partial_scores_and_other_departments(): void
+    {
+        $this->postJson(route('assessments.import.fill'), [
+            'risk_asset_id'=>1, 'profile'=>'usim-2026', 'stage'=>'expected',
+            'workbook'=>$this->expectedWorkbook(['expected_c'=>1]),
+        ])->assertUnprocessable()->assertJsonValidationErrors('expected.i');
+        $this->postJson(route('assessments.import.fill'), [
+            'risk_asset_id'=>2, 'profile'=>'usim-2026', 'stage'=>'expected',
+            'workbook'=>$this->expectedWorkbook(['expected_c'=>1]),
+        ])->assertForbidden();
     }
 }
 

@@ -82,6 +82,7 @@ Treatment Implementation | NACSA Toolkit
                         <tr>
                             <th>Result</th>
                             <th>Inherent Risk</th>
+                            <th>Expected Risk</th>
                             <th>Residual risk</th>
                         </tr>
                     </thead>
@@ -89,11 +90,13 @@ Treatment Implementation | NACSA Toolkit
                         <tr>
                             <th>Score</th>
                             <td>{{ $baseline['result']['score'] ?? 'Unavailable' }}</td>
+                            <td>{{ $baseline['expected_result']['score'] ?? 'Not assessed' }}</td>
                             <td>{{ $treatment->residual_result['score'] ?? 'Unavailable' }}</td>
                         </tr>
                         <tr>
                             <th>Risk label</th>
                             <td>@include('partials.risk-badge', ['riskResult' => $baseline['result'] ?? [], 'riskProfile' => $assessment->profile])</td>
+                            <td>@include('partials.risk-badge', ['riskResult' => $baseline['expected_result'] ?? [], 'riskProfile' => $assessment->profile])</td>
                             <td>@include('partials.risk-badge', ['riskResult' => $treatment->residual_result ?? [], 'riskProfile' => $assessment->profile])</td>
                         </tr>
                     </tbody>
@@ -108,6 +111,7 @@ Treatment Implementation | NACSA Toolkit
                         <tr>
                             <th>Input</th>
                             <th>Inherent Risk</th>
+                            <th>Expected Risk</th>
                             <th>Residual risk</th>
                         </tr>
                     </thead>
@@ -116,6 +120,7 @@ Treatment Implementation | NACSA Toolkit
                             <tr>
                                 <th>{{ $label }}</th>
                                 <td>{{ $baseline['inputs'][$key] ?? 'Unavailable' }}</td>
+                                <td>{{ $baseline['expected_inputs'][$key] ?? 'Not assessed' }}</td>
                                 <td>{{ $treatment->residual_inputs[$key] ?? 'Unavailable' }}</td>
                             </tr>
                         @endforeach

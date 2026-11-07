@@ -34,7 +34,8 @@
 @media(max-width:900px) { .dashboard-analytics { grid-template-columns:1fr; } .status-visual { flex-direction:row; } }
 @media(max-width:600px) { .dashboard-page .analytics-panel { padding:20px; } .status-visual { flex-direction:column; } .dashboard-departments { grid-template-columns:1fr; } .work-bar-label { font-size:12px; } }
 
-.dashboard-risk-grid { margin-top:24px; }
+.dashboard-risk-grid { margin-top:24px; grid-template-columns:repeat(3,minmax(0,1fr)); }
+@media(max-width:1100px) { .dashboard-risk-grid { grid-template-columns:1fr; } }
 .dashboard-page .risk-population { margin:0 0 24px; color:#526974; font-size:13px; }
 .risk-population strong { color:#183540; font-size:28px; margin-right:6px; font-variant-numeric:tabular-nums; }
 .risk-distribution { display:grid; gap:22px; }

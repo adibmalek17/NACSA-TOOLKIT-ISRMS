@@ -212,6 +212,7 @@ Risk Assessments | NACSA Toolkit
                 </div>
 
     
+                @include('partials.expected-risk-fields')
                 <button type="submit">Save Assessment</button>
             </form>
         @elseif ($canCreate)
@@ -291,6 +292,7 @@ Risk Assessments | NACSA Toolkit
                         <th scope="col">Date</th>
                         <th scope="col">Profile</th>
                         <th scope="col">Inherent risk</th>
+                        <th scope="col">Expected risk</th>
                         <th scope="col">Residual risk</th>
                         <th scope="col">Status</th>
                         <th scope="col">Actions</th>
@@ -314,6 +316,7 @@ Risk Assessments | NACSA Toolkit
                             <td>
                                 <strong>{{ $assessment->result['score'] ?? 'Not assessed' }}</strong>
                             </td>
+                            <td><strong>{{ \App\Services\ExpectedRisk::decode($assessment->expected_result ?? null)['score'] ?? 'Not assessed' }}</strong></td>
                             <td>
                                 @forelse ($riskComparisons->get($assessment->id, []) as $comparison)
                                     <div>Plan #{{ $comparison['plan_id'] }}: {{ $comparison['result']['score'] ?? 'Not assessed' }}
@@ -336,7 +339,7 @@ Risk Assessments | NACSA Toolkit
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="9">
+                            <td colspan="10">
                                 @if ($filters['q'] !== '' || $filters['status'] !== '' || $filters['filter_profile'] !== '')
                                     No assessments match your filters. Try another search or reset the filters.
                                 @else
@@ -405,5 +408,5 @@ Risk Assessments | NACSA Toolkit
         updateScoreFields();
     }
 </script>
-<script src="{{ asset('js/assessment-excel-fill.js').'?v=scoring-form-2' }}" defer></script>
+<script src="{{ asset('js/assessment-excel-fill.js').'?v=expected-risk-1' }}" defer></script>
 @endsection

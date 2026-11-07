@@ -19,6 +19,8 @@ final class AssessmentWorkbookReader
         'loss', 'operations', 'financial', 'reputation',
     ];
 
+    public const EXPECTED_HEADERS = ['expected_c', 'expected_i', 'expected_a', 'expected_likelihood', 'expected_loss', 'expected_operations', 'expected_financial', 'expected_reputation'];
+
     public function read(string $path): array
     {
         if (! class_exists(ZipArchive::class)) {
@@ -57,8 +59,8 @@ final class AssessmentWorkbookReader
             if (! $info) {
                 $this->fail('The workbook must contain a sheet named Assessments.');
             }
-            if ($info['totalRows'] > 101 || $info['totalColumns'] > count(self::HEADERS)) {
-                $this->fail('Use at most 100 assessment rows and the 15 template columns (A to O).');
+            if ($info['totalRows'] > 101 || $info['totalColumns'] > count(self::HEADERS) + count(self::EXPECTED_HEADERS)) {
+                $this->fail('Use at most 100 assessment rows and at most 23 supported columns.');
             }
             $reader->setLoadSheetsOnly(['Assessments']);
             $book = $reader->load($path);
@@ -67,14 +69,15 @@ final class AssessmentWorkbookReader
             for ($column = 1; $column <= $info['totalColumns']; $column++) {
                 $headers[] = trim((string) $sheet->getCell([$column, 1])->getValue());
             }
-            $formHeaders = array_values(array_diff(self::HEADERS, ['asset_code', 'profile']));
-            if ($headers !== self::HEADERS && $headers !== $formHeaders) {
-                $this->fail('Keep the downloaded template headers in row 1 unchanged and in their original order.');
+            $allowed = array_merge(self::HEADERS, self::EXPECTED_HEADERS);
+            if (count($headers) !== count(array_unique($headers)) || in_array('', $headers, true)
+                || array_diff($headers, $allowed) !== []) {
+                $this->fail('Use unique supported column names in row 1. Expected scores use expected_c, expected_i, expected_a, expected_likelihood and the profile impact columns.');
             }
 
             $rows = [];
             for ($rowNumber = 2; $rowNumber <= $info['totalRows']; $rowNumber++) {
-                $values = array_fill_keys(self::HEADERS, '');
+                $values = array_fill_keys(array_merge(self::HEADERS, self::EXPECTED_HEADERS), '');
                 $errors = [];
                 foreach ($headers as $index => $header) {
                     $cell = $sheet->getCell([$index + 1, $rowNumber]);

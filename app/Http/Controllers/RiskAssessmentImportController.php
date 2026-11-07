@@ -36,6 +36,7 @@ final class RiskAssessmentImportController extends Controller
     public function fill(Request $request, AssessmentWorkbookReader $reader)
     {
         $base = $request->validate([
+            'stage' => ['nullable', Rule::in(['assessment', 'expected'])],
             'risk_asset_id' => ['required', 'integer'],
             'profile' => ['required', Rule::in(self::PROFILES)],
             'workbook' => ['required', 'file', 'extensions:xlsx', 'mimes:xlsx', 'max:2048'],
@@ -61,6 +62,25 @@ final class RiskAssessmentImportController extends Controller
             throw ValidationException::withMessages(['workbook' => $row['errors']]);
         }
         $values = $row['values'];
+        $expectedData = [];
+        foreach (\App\Services\ExpectedRisk::KEYS as $key) {
+            $expectedData[$key] = $values['expected_'.$key] ?? '';
+        }
+        $expected = \App\Services\ExpectedRisk::calculate(['expected' => $expectedData], $profile, app(\App\Domain\Risk\RiskCalculator::class));
+        $expectedFields = [];
+        foreach (\App\Services\ExpectedRisk::KEYS as $key) {
+            $expectedFields['expected_'.$key] = $expected['inputs'][$key] ?? '';
+        }
+        if (($base['stage'] ?? 'assessment') === 'expected') {
+            if ($expected['inputs'] === null) {
+                throw ValidationException::withMessages(['workbook' => 'No expected risk scores found. Use expected_ column names.']);
+            }
+            return response()->json([
+                'fields' => $expectedFields, 'row' => $row['row'],
+                'risk_asset_id' => (int) $asset->id, 'profile' => $profile,
+            ])->header('Cache-Control', 'private, no-store');
+        }
+
         $isUsim = $profile === 'usim-2026';
         $max = $profile === 'nacsa-5-2024' ? 5 : 3;
         $scoreKeys = array_merge(['c', 'i', 'a', 'likelihood'], $isUsim
@@ -89,7 +109,7 @@ final class RiskAssessmentImportController extends Controller
         }
         // No database writes: the existing assessment store action remains the only save step.
         return response()->json([
-            'fields' => $fields,
+            'fields' => array_merge($fields, $expectedFields),
             'row' => $row['row'],
             'risk_asset_id' => (int) $asset->id,
             'profile' => $profile,

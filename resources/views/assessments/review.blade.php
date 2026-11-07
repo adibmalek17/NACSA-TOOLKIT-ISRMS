@@ -37,7 +37,10 @@ Review Assessment #{{ $assessment->id }} | NACSA Toolkit
     @endif
 
     <section>
-        <h2>Inherent Risk Review</h2>
+        <h2>Inherent and Expected Risk Review</h2>
+        <p>Expected Risk Score: <strong>{{ $expectedReview['score'] ?? 'Not assessed' }}</strong>
+            @include('partials.risk-badge', ['riskResult' => $expectedReview, 'riskProfile' => $assessment->profile])
+        </p>
 
         @if ($assessment->asset_deleted_at)
             <p>
@@ -136,9 +139,6 @@ Review Assessment #{{ $assessment->id }} | NACSA Toolkit
         @else
             <p>No workflow action is available for the current status.</p>
         @endif
-        @php
-            $currentDecision = $reviews->firstWhere('revision', $assessment->revision);
-        @endphp
         @if ($currentDecision && in_array($assessment->status, ['verified', 'returned'], true))
             <div class="current-review-decision">
                 <p><strong>{{ ucfirst($currentDecision->decision) }}</strong><br>
